@@ -1,0 +1,443 @@
+#listModules {
+    direction: ltr;
+    background: #eee!important;
+}
+
+a:focus {
+    outline: thin dotted;
+}
+
+a:hover,
+a:active {
+    outline: 0;
+}
+
+a,
+a code {
+    color: #fff;
+    text-decoration: none;
+}
+
+a:hover,
+a:hover code {
+    color: #fff;
+}
+
+a:active,
+a:active code {
+    color: #fff;
+}
+
+:not(#app-items) > ul > .tile {
+    margin: 10px;
+}
+
+:not(#app-items) > ul > .tile.subMenu {
+    margin: 5px;
+}
+
+.tile {
+    display: inline-block;
+    width: 90px;
+    height: 90px;
+    margin: 4px;
+    position: relative;
+    color: #fff;
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+#listModules .tile {
+    background: #ffffff;
+    border: 1px solid #b5b5b5;
+    border-width: 0px;
+    color: black;
+}
+
+#listModules .tile:hover, #app-items > ul > .tile:hover {
+    outline: #b5b5b5 auto thick;
+
+}
+
+#listModules .tile i {
+    color: #1293b8;
+}
+
+.tile a {
+    transition: background 0.5s ease;
+}
+
+.tile i, .tile img {
+    line-height: 120px;
+}
+
+.tile i, .tile .title {
+    line-height: 14px;
+    transition: all 0.5s ease;
+}
+
+.tile i {
+    font-size: 40px;
+}
+
+#listModules .tile i {
+    font-size: 1.9em;
+}
+
+.tile .title {
+    font-size: 11px;
+    color: black;
+}
+
+.sous-menus_subMenu > i.fa-ellipsis-v {
+    position: absolute;
+    right: 0;
+}
+
+.tile .text, .tile .title, .tile .tilecontent .tile > i, .tile > a > i, .tile .caption, .tile .sub, .tile .title-right {
+    position: absolute;
+    margin: 0;
+}
+
+.tile .text, .tile .title, .tile .tilecontent .tile .caption, .tile .sub, .tile .title-right {
+    font-size: 14px;
+}
+
+#listModules .tile.subMenu .text, #listModules .tile.subMenu .title, #listModules .tile.subMenu .tilecontent .tile.subMenu .caption, #listModules .tile.subMenu .sub, #listModules .tile.subMenu .title-right {
+    font-size: 15px;
+}
+
+#listModules .tile .text, #listModules .tile .title, #listModules .tile .tilecontent .tile .caption, #listModules .tile .sub, #listModules .tile .title-right {
+    font-size: 20px;
+}
+
+.hs {
+    height: 52px;
+}
+
+.hs i, .hs img {
+    line-height: 52px;
+}
+
+.subMenu.h1 {
+    height: 120px;
+}
+
+.h1 {
+    height: 160px;
+}
+
+.h1 i.icon, .h1 img {
+    line-height: 70px;
+}
+
+#listModules .h1 i.icon, #listModules .h1 img, .modulesContainer .h1 i.icon, .modulesContainer .h1 img {
+    line-height: 60px;
+}
+
+.h2 {
+    height: 256px;
+}
+
+.h2 i, .h2 img {
+    line-height: 256px;
+}
+
+.h3 {
+    height: 392px;
+}
+
+.h3 i, .h3 img {
+    line-height: 392px;
+}
+
+.h4 {
+    height: 528px;
+    line-height: 528px;
+}
+
+.h4 i, .h4 img {
+    line-height: 528px;
+}
+
+.w2 {
+    width: 230px;
+}
+
+#listModules .subMenu .w2 {
+    width: 130px;
+}
+
+#listModules .w2 {
+    width: 220px;
+}
+
+.tile a {
+    color: #fff;
+}
+
+.tile .link_app_list {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    color: white;
+}
+
+.tile i.icon {
+    width: 33%;
+    text-align: center;
+    top: 0;
+}
+
+#listModules .tile.subMenu i.icon {
+    top: 0;
+    left: 0;
+}
+
+#listModules .tile i.icon {
+    top: 21%;
+    left: 34%;
+}
+
+#listModules .tile i.ellipsis {
+    top: 35%;
+    right: 4px; 
+    font-size: 16px;
+    color: #0000004d;
+    padding: 8px;
+}
+
+#listModules .tile.subMenu i.ellipsis:hover {
+    background-color: #88888814;
+    cursor: pointer;
+}
+
+#listModules .tile.subMenu:hover > a > ul.sous-menus {
+    transform: scale(1);
+    transition-delay: 0.3s;
+}
+
+#listModules .tile.subMenu > a > ul {
+    min-width: 200px;
+    padding: 5px 0;
+    transition: all 0.3s ease;
+    transform: scale(0);
+    transform-origin: left 35%;
+    position: absolute;
+    left: 230px;
+   /* bottom: 10px;*/
+    color: black;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, .2);
+    background-color: white;
+    z-index: 99999;
+}
+
+#listModules .tile.subMenu > a > ul ul {
+    display: none;
+    min-width: 200px;
+    padding: 5px 0;
+    position: absolute;
+    left: 200px;
+    top: 5px;
+    color: black;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, .2);
+    background-color: white;
+    z-index: 99999;
+}
+
+#listModules .tile.subMenu > a > ul ul.right {
+    left: 200px !important;
+    right: initial !important;
+    top: -5px;
+}
+
+#listModules .tile.subMenu > a > ul ul.left {
+    left: initial !important;
+    right: 200px !important;
+    top: -5px;
+}
+
+#listModules .tile.subMenu > a > ul li {
+    position: relative;
+    display: flex;
+    list-style: none;
+    padding: 5px 0;
+    padding-left: 10px;
+}
+
+#listModules .tile.subMenu > a > ul li:hover {
+    background-color: #8888882e;
+}
+
+#listModules .tile.subMenu > a > ul li:hover > i {
+    color: #1293b8 !important;
+}
+
+#listModules .tile.subMenu > a > ul li > * {
+    font-size: 13px !important;
+}
+
+#listModules .tile.subMenu > a > ul li > i {
+    width: 20px;
+    color: #676767 !important;
+    text-align: center;
+}
+
+#listModules .tile.subMenu > a > ul li > p {
+    color: black;
+    padding-left: 7px;
+    line-height: 10px;
+    margin-bottom: 0;
+}
+
+/*==== 2.16 Tile Title ====*/
+.tile .title {
+    left: 16px;
+    bottom: 8px;
+    font-family: Roboto;
+}
+
+#listModules .tile.subMenu .title {
+    bottom: 0;
+}
+
+#listModules .tile .title {
+    left: 0;
+    bottom: 12px;
+    right: 0;
+    padding: 10px;
+    padding-right: 24px;
+    font-family: Roboto;
+}
+
+.ws .title, .hs .title {
+    display: none;
+}
+
+.tile .sub {
+    right: 16px;
+    bottom: 8px;
+}
+
+.ws .title, .hs .title, .ws .sub, .ws .title {
+    display: none;
+}
+
+div#listModules {
+    display: flex;
+}
+
+#listModules > ul {
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    align-content: center;
+}
+
+.subMenu > a {
+    display: flex;
+    height: 100%;
+    align-items: center;
+}
+
+.subMenu > a > .title, .subMenu > a > i.icon {
+    position: relative;
+}
+
+#listModules .subMenu > a > i.icon {
+    font-size: 25px;
+    line-height: 40px;
+    width: 45px;
+    padding-left: 15px;
+}
+
+#listModules .subMenu.tile {
+    width: 230px;
+    height: 90px;
+}
+
+div.modulesContainer > ul {
+    height: max-content;
+    position: absolute;
+    left: 200px;
+    right: 200px;
+    top: 80px;
+    margin-bottom: 60px;
+}
+
+.suiteSSMenu {
+    position: absolute;
+    right: 10px;
+    font-size: 15px;
+}
+
+.module {
+    display: flex;
+    position: fixed;
+    top: 100px;
+    left: 100px;
+    right: 100px;
+    color: #8888888c;
+    z-index: 99999;
+}
+
+.module > p {
+    font-size: 22px;
+    padding-left: 13px;
+}
+
+div.modulesContainer {
+    height: calc(100vh - 38px);
+    width: 100vw;
+    overflow-x: auto;
+    position: relative;
+}
+
+.deleteRowDatatables {
+    color: #a90329 !important;
+    background-color: rgba(169, 3, 41, 0) !important;
+    border-color: rgba(255, 255, 255, 0) !important;
+    box-shadow: inset 0 0 0 rgba(0, 0, 0, .05) !important;
+}
+
+.global_breadcrumbs {
+    display: inline;
+    margin-left: 220px;
+    color: ghostwhite;
+    text-transform: capitalize;
+    font-size: 17px;
+}
+
+.dt-button-background {
+    width: 0 !important;
+}
+
+#listModules .subMenu > a > i.icon {
+    padding-right: 15px;
+}
+
+.module > p {
+    order: 2;
+    padding-right: 13px;
+}
+
+.module > i {
+    order: 1;
+}
+
+#listModules .tile .title {
+    padding-right: 10px;
+    padding-left: 24px;
+}
+
+#listModules .tile ul.sous-menus > li {
+    padding-left: 0;
+    padding-right: 10px;
+}
+
+#listModules .tile ul.sous-menus > li > p {
+    padding-left: 0;
+    padding-right: 7px;
+}

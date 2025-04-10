@@ -1,0 +1,84 @@
+.rc-tabs-nav-wrap{
+    font-size: 12px; 
+    background-color: #eeeeee;
+}
+
+.rc-tabs .rc-tabs-bar {
+    position: fixed;
+    z-index: 9;
+    padding-right: 0;
+    padding-left: 0;
+    background-color: #fbfbfb;
+    left: 0;
+    border-top: 0 solid #CFCFCF;
+    margin-left: 5px;
+}
+
+.rc-tabs .rc-tabs-tabpane-active {
+    visibility: visible;
+ position: fixed; 
+top: 74px;;
+}
+
+.rc-tabs-nav-scroll {
+    width: 100% !important;
+}
+
+.rc-tabs-nav-scroll .rc-tabs-nav {
+    float: right;
+    top: -5px;
+}
+.rc-tabs-tab{
+    background-color: white;
+}
+.rc-tabs-tab:hover {
+    background: #eee;
+  }
+/*for fr**/
+.rc-tabs-top .rc-tabs-tab {
+    height: 100%;
+    color: rgb(153, 153, 153);
+    margin: 0px;
+}
+.rc-tabs-top .rc-tabs-tab[aria-selected="true"]{
+    color: #1293b8!important;
+    border: 0 solid #1293b8;
+    border-bottom-width: 2px;
+}
+.rc-tabs.rc-tabs-top{
+    background-color: white;
+}
+
+/*tab plus*/
+#tab-0.rc-tabs-tab{
+    background: #eee!important;
+    margin-right: 0px !important; 
+    margin-left: 0px !important;
+    padding-right: 9px;
+    padding-left: 2px!important;
+    float: right;
+    border: 0 solid rgb(238 238 238);
+    border-bottom-width: 2px;
+}
+
+
+.rc-tabs-top .rc-tabs-tab .addTab{
+    padding: 0px 1px 0px 8px;
+    font-size: 11px !important;
+    color: black;
+    border: none;
+}
+
+.rc-tabs-tab-active .close {
+    color: black !important;
+}
+
+.rc-tabs-tab .close {
+    top: 13px !important;
+    font-size: 11px !important;
+    right: 5px;
+}
+
+.rc-tabs-ink-bar{
+    display: none!important;
+}

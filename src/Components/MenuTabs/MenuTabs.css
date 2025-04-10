@@ -1,0 +1,190 @@
+.rc-tabs .rc-tabs-bar {
+    position: fixed;
+    z-index: 9;
+    padding-right: 0;
+    padding-left: 0;
+    background-color: #fbfbfb;
+    right: 0;
+    left: 0;
+    border-top: 0 solid #CFCFCF;
+}
+
+.rc-tabs .rc-tabs-content {
+    visibility: visible;
+    position: relative!important;
+    top: 37px!important;
+}
+
+.rc-tabs-nav-scroll {
+    width: 100% !important;
+}
+
+.rc-tabs-nav-scroll .rc-tabs-nav {
+    float: right;
+}
+
+.rc-tabs-top .rc-tabs-tab{
+    background-color: #eee;
+}
+
+.rc-tabs-tab {
+    margin-right: 5px !important;
+    margin-left: 5px !important;
+    padding-right: 10px;
+    padding-left: 30px;
+}
+
+.rc-tabs-tab-active .close {
+    color: black !important;
+}
+
+.rc-tabs-tab .close {
+    left: 7px;
+    right: inherit;
+}
+
+/****** from csysframwork ******/
+.withTabs .ribbon {
+    padding-right: 0;
+    padding-left: 0;
+    background-color: #fbfbfb;
+    position: fixed;
+    right: 0;
+    left: 0;
+    height: 30px;
+    top: 38px;
+    border-top: 0 solid #CFCFCF;
+}
+
+.withTabs .ribbon > div, .withTabs .ribbon > div > div {
+    height: 100%;
+}
+
+.withTabs .tabs {
+    height: 100%;
+    position: absolute;
+    box-shadow: 0 1px 1px #bfbfbf;
+    z-index: 99999;
+}
+
+.withTabs .content {
+    display: none;
+}
+
+.withNotTabs .ribbon {
+    display: none;
+}
+
+.withNotTabs .content > div {
+    width: 100%;
+}
+
+div.royal_tab > div.tabs > div.scroller > ul > li:hover:not(.active) {
+    background-color: #f4f4f4;
+    border-bottom-color: #999;
+}
+
+div.royal_tab .views {
+    visibility: visible;
+    background-color: #FFFFFF;
+    position: relative;
+    top: 30px;
+    z-index: 99998;
+}
+
+div.royal_tab > div.tabs > div.scroller > ul > li,
+div.royal_tab > div.tabs > a.dropdown_menu > ul {
+    border-radius: 2px 2px 0 0;
+}
+
+div.royal_tab > div.views {
+    clear: both;
+}
+
+div.royal_tab > div.views > .scroller > div {
+    display: none;
+}
+
+div.royal_tab > div.views > .scroller > div.active {
+    display: block;
+}
+
+div.royal_tab > .tabs > .sliding_menu,
+div.royal_tab > .tabs > .dropdown_menu {
+    display: none !important;
+}
+
+div.royal_tab > .tabs > div {
+    max-width: 100vw;
+    width: 100vw;
+    height: 100%;
+    padding: 0 5px;
+}
+
+div.royal_tab > .tabs > div > .ui-tabs-nav {
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    margin: 0;
+    padding: 0;
+    font-size: 13px;
+    background-color: white;
+}
+
+div.royal_tab > .tabs:first-child > div > .ui-tabs-nav > li .closeTab {
+    position: absolute;
+    right: 7px;
+    top: 10px;
+    font-size: 11px;
+    color: #999;
+}
+
+div.royal_tab > .tabs:first-child > div > .ui-tabs-nav > li {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    position: relative;
+    width: 14%;
+    max-width: 200px;
+    padding: 0 18px 0 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-grow: 1;
+    margin-right: 0;
+    color: #999;
+    line-height: 32px;
+    cursor: pointer;
+}
+
+div.royal_tab > .tabs > div > .ui-tabs-nav > li:last-child {
+    min-width: 27px;
+    max-width: 27px;
+    padding: 0 10px;
+    background: #eee;
+    color: black;
+    border: none;
+    font-weight: 700;
+    font-size: 18px;
+}
+
+div.royal_tab > .tabs > div > .ui-tabs-nav > li.active {
+    border: 0 solid #1293b8;
+    background: white;
+    color: #1293b8;
+    border-bottom-width: 2px;
+}
+
+div.royal_tab > .tabs > div > .ui-tabs-nav > li.active .closeTab {
+    color: black;
+}
+
+div.royal_tab > .tabs > div > .ui-tabs-nav > li.active:last-child {
+    color: black;
+}
+
+div.royal_tab > .tabs > div > .ui-tabs-nav > li {
+    min-width: 100px;
+}

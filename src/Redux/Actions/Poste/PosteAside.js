@@ -1,0 +1,86 @@
+import {
+    CLOSE_ASIDE_POSTE,
+    RESET_ASIDE_POSTE,
+    SHOW_ASIDE_ADD_MODE_POSTE,
+    SHOW_ASIDE_EDIT_MODE_POSTE,
+    SHOW_ASIDE_DELETE_MODE_POSTE,
+    SHOW_ASIDE_CONSULT_MODE_POSTE,
+    SHOW_MODAL_CONFIRMATION_POSTE,
+    CLOSE_MODAL_CONFIRMATION_POSTE
+} from "../../Constants/Poste/PosteAside";
+import axios from "axios";
+import Ressources from '../../../Helper/Ressources';
+
+export const handleOpenAddMode = (successCallback) => {
+    return dispatch => {
+        dispatch({
+            type: SHOW_ASIDE_ADD_MODE_POSTE,
+            payload: successCallback
+        });
+    }
+}
+
+export const handleOpenConsultMode = (selectedPoste) => {
+    return dispatch => {
+        dispatch({
+            type: SHOW_ASIDE_CONSULT_MODE_POSTE,
+            payload: selectedPoste
+        });
+    }
+}
+
+export const handleOpenDeleteMode = (selectedPoste, successCallback) => {
+    return dispatch => {
+        dispatch({
+            type: SHOW_ASIDE_DELETE_MODE_POSTE,
+            payload: {selectedPoste: selectedPoste, successCallback: successCallback}
+        });
+    }
+}
+
+export const handleOpenEditMode = (selectedPoste, successCallback) => {
+    return dispatch => {
+        dispatch({
+            type: SHOW_ASIDE_EDIT_MODE_POSTE,
+            payload: {selectedPoste: selectedPoste, successCallback: successCallback}
+        });
+    }
+}
+
+export const handleClose = () => {
+    return dispatch => {
+        dispatch({
+            type: CLOSE_ASIDE_POSTE
+        });
+    }
+}
+
+export const clearForm = () => {
+    return dispatch => {
+        dispatch({
+            type: RESET_ASIDE_POSTE
+        });
+    }
+}
+
+
+
+export const handleOpenModalConfirmation = (messageToShow, handleBtnCancelModalConfirmation, handleBtnConfirmerModalConfirmation) => {
+    return dispatch => {
+        dispatch({
+            type: SHOW_MODAL_CONFIRMATION_POSTE,
+            messageToShow: messageToShow,
+            actionBtnModalConfirmation: {handleBtnCancelModalConfirmation, handleBtnConfirmerModalConfirmation}
+        });
+    }
+}
+
+export const handleCloseModalConfirmation = (successCallback) => {
+    return dispatch => {
+        dispatch({
+            type: CLOSE_MODAL_CONFIRMATION_POSTE,
+            payload: successCallback
+        });
+    }
+}
+

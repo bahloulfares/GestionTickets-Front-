@@ -1,0 +1,11 @@
+{
+  "baseUrl": "http://localhost:8080/Budget/",
+  "screenshotsFolder": "mochawesome-report/screenshots",
+  "videosFolder": "mochawesome-report/videos",
+  "reporter": "mochawesome",
+  "reporterOptions": {
+    "overwrite": false,
+    "html": true,
+    "json": true
+  }
+}

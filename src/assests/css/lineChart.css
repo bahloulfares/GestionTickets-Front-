@@ -1,0 +1,9 @@
+.modal-chart .modal-header{
+    padding: 5px 15px 5px 15px!important;
+    min-height: 16.43px;
+}
+.modal-chart .modal-footer{
+    padding: 1px!important;
+    text-align: right;
+    border-top: 1px solid #e5e5e5;
+}

@@ -1,0 +1,5 @@
+export const GET_ALL_CLIENT = 'GET_ALL_CLIENT';
+export const GET_CLIENT_BY_CODE = 'GET_CLIENT_BY_CODE';
+export const ADD_NEW_CLIENT = 'ADD_NEW_CLIENT';
+export const EDIT_CLIENT = 'EDIT_CLIENT';
+export const DELETE_CLIENT = 'DELETE_CLIENT';

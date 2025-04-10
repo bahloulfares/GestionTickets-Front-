@@ -1,0 +1,24 @@
+
+/*css datagrid aside*/
+/* .aside-dialog .revisionTarifaire .dx-datagrid.dx-gridbase-container.dx-datagrid-borders{
+    max-height: calc(100vh - 210px);
+} */
+
+/* .aside-dialog .RevisionCASociete .dx-datagrid.dx-gridbase-container.dx-datagrid-borders{
+    max-height: calc(100vh - 210px);
+} */
+ /** css datagrid modal CASociete*/
+.modalRevisionCASociete .dx-datagrid.dx-gridbase-container.dx-datagrid-borders{
+    padding: 1px 2px 0px 2px;
+    max-height: calc(100vh - 185px);
+}
+
+/* .aside-dialog .revisionCentre .dx-datagrid.dx-gridbase-container.dx-datagrid-borders{
+    max-height: calc(100vh - 219px);
+} */
+.aside-dialog .revisionVolumeActe .dx-datagrid.dx-gridbase-container.dx-datagrid-borders{
+    max-height: calc(100vh - 219px);
+}
+.aside-dialog .revisionVolumeSansActe .dx-datagrid.dx-gridbase-container.dx-datagrid-borders{
+    max-height: calc(100vh - 219px);
+}

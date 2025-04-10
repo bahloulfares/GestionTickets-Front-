@@ -1,0 +1,5 @@
+export const GET_ALL_MODULE = 'GET_ALL_MODULE';
+export const ADD_NEW_MODULE = 'ADD_NEW_MODULE';
+export const GET_MODULE_BY_CODE = 'GET_MODULE_BY_CODE';
+export const DELETE_MODULE = 'DELETE_MODULE';
+export const EDIT_MODULE = 'EDIT_MODULE';

@@ -1,0 +1,5 @@
+export const GET_ALL_POSTE = 'GET_ALL_POSTE';
+export const ADD_NEW_POSTE='ADD_NEW_POSTE'
+export const GET_POSTE_BY_CODE='GET_POSTE_BY_CODE'
+export const DELETE_POSTE='DELETE_POSTE'
+export const EDIT_POSTE='EDIT_POSTE'
