@@ -96,44 +96,90 @@ const PosteGrid = () => {
         HelperGrid.handleToolbarPreparing(e, dataGrid, buttons, filtres, PostesReducer)
     }
     const onClickBtnAdd = () => {
-        dispatch(handleOpenAddMode(refreshDataGrid))
+        dispatch(handleOpenAddMode(refreshDataGrid));
     }
     const onClickBtnEdit = () => {
         if (dataGrid.current !== null) {
             let dataGridInstance = dataGrid.current.instance;
-            let selectedRowKeys = dataGridInstance.getSelectedRowKeys()[0];
-            dispatch(getPosteByCode(selectedRowKeys))
+            let selectedRowKeys = dataGridInstance.getSelectedRowKeys();
+            
+            if (selectedRowKeys.length === 0) {
+                notify("Veuillez sélectionner un poste à modifier", "warning", notifyOptions);
+                return;
+            }
+            
+            dispatch(getPosteByCode(selectedRowKeys[0]))
                 .then((data) => {
-                        dispatch(handleOpenEditMode(data, refreshDataGrid))
+                    if (data) {
+                        dispatch(handleOpenEditMode(data, refreshDataGrid));
+                    } else {
+                        notify("Impossible de récupérer les données du poste", "error", notifyOptions);
+                    }
                 })
+                .catch((error) => {
+                    console.error("Erreur lors de la récupération du poste:", error);
+                    notify("Une erreur est survenue lors de la récupération des données", "error", notifyOptions);
+                });
         }
     }
     const onClickBtnConsult = () => {
         if (dataGrid.current !== null) {
             let dataGridInstance = dataGrid.current.instance;
-            let selectedRowKeys = dataGridInstance.getSelectedRowKeys()[0];
-            dispatch(getPosteByCode(selectedRowKeys))
-                .then((data) =>
-                    dispatch(handleOpenConsultMode(data, refreshDataGrid))
-                )
+            let selectedRowKeys = dataGridInstance.getSelectedRowKeys();
+            
+            if (selectedRowKeys.length === 0) {
+                notify("Veuillez sélectionner un poste à consulter", "warning", notifyOptions);
+                return;
+            }
+            
+            dispatch(getPosteByCode(selectedRowKeys[0]))
+                .then((data) => {
+                    if (data) {
+                        dispatch(handleOpenConsultMode(data, refreshDataGrid));
+                    } else {
+                        notify("Impossible de récupérer les données du poste", "error", notifyOptions);
+                    }
+                })
+                .catch((error) => {
+                    console.error("Erreur lors de la récupération du poste:", error);
+                    notify("Une erreur est survenue lors de la récupération des données", "error", notifyOptions);
+                });
         }
     }
     const onClickBtnDelete = () => {
         if (dataGrid.current !== null) {
             let dataGridInstance = dataGrid.current.instance;
-            let selectedRowKeys = dataGridInstance.getSelectedRowKeys()[0];
-            dispatch(getPosteByCode(selectedRowKeys))
+            let selectedRowKeys = dataGridInstance.getSelectedRowKeys();
+            
+            if (selectedRowKeys.length === 0) {
+                notify("Veuillez sélectionner un poste à supprimer", "warning", notifyOptions);
+                return;
+            }
+            
+            dispatch(getPosteByCode(selectedRowKeys[0]))
                 .then((data) => {
-                        dispatch(handleOpenDeleteMode(data, refreshDataGrid))
-                    
-                }
-                )
+                    if (data) {
+                        dispatch(handleOpenDeleteMode(data, refreshDataGrid));
+                    } else {
+                        notify("Impossible de récupérer les données du poste", "error", notifyOptions);
+                    }
+                })
+                .catch((error) => {
+                    console.error("Erreur lors de la récupération du poste:", error);
+                    notify("Une erreur est survenue lors de la récupération des données", "error", notifyOptions);
+                });
         }
     }
     const onClickBtnEditionList = () => {
-        dispatch(handleOpenModal())
+        dispatch(handleOpenModal());
         let du = PostesReducer.dateDebut;
         let au = PostesReducer.dateFin;
+        
+        if (!du || !au) {
+            notify("Veuillez sélectionner une période valide", "warning", notifyOptions);
+            return;
+        }
+        
         let url = `${Ressources.CoreUrlB}/${Ressources.compteClient.api}/${Ressources.compteClient.postes}/edition/listePostes?du=${du}&au=${au}`;
         impression(url);
     }
@@ -143,9 +189,15 @@ const PosteGrid = () => {
     const onClickBtnEdition = () => {
         if (dataGrid.current !== null) {
             let dataGridInstance = dataGrid.current.instance;
-            let selectedRowKeys = dataGridInstance.getSelectedRowKeys()[0];
-            dispatch(handleOpenModal())
-            let url = `${Ressources.CoreUrlB}/${Ressources.compteClient.api}/${Ressources.compteClient.postes}/edition/${selectedRowKeys}`;
+            let selectedRowKeys = dataGridInstance.getSelectedRowKeys();
+            
+            if (selectedRowKeys.length === 0) {
+                notify("Veuillez sélectionner un poste pour l'édition", "warning", notifyOptions);
+                return;
+            }
+            
+            dispatch(handleOpenModal());
+            let url = `${Ressources.CoreUrlB}/${Ressources.compteClient.api}/${Ressources.compteClient.postes}/edition/${selectedRowKeys[0]}`;
             impression(url);
         }
     }
@@ -168,37 +220,65 @@ const PosteGrid = () => {
         <TableGrid
             dataGrid={dataGrid}
             keyExpr='idPoste'
-            customStore={HelperGrid.constructCustomStore(`${`${Ressources.CoreUrlB}/${Ressources.compteClient.api}/${Ressources.compteClient.postes}`}`,
+            customStore={HelperGrid.constructCustomStore(`${Ressources.CoreUrlB}/${Ressources.compteClient.api}/${Ressources.compteClient.postes}`,
                 'idPoste')}
             onToolbarPreparing={onToolbarPreparing}
             onSelectionChanged={onSelectionChanged}
             onRowClick={onRowClick}
             fileName={messages.Postes}
             columns={[
-                ,
+                {
+                    dataField: 'idPoste',
+                    caption: "ID",
+                    width: 80,
+                    alignment: 'center',
+                    allowSorting: true,
+                    sortIndex: 0,
+                    sortOrder: 'asc'
+                },
                 {
                     dataField: 'designation',
-                    caption: "Désignation"
+                    caption: "Désignation",
+                    width: 250,
+                    allowFiltering: true,
+                    allowSorting: true
                 },
+                // {
+                //     dataField: 'dateCreation',
+                //     caption: "Date création",
+                //     customizeText: renderDateFormat,
+                //     width: 120,
+                //     allowSorting: true,
+                //     visible: true
+                // },
+                // {
+                //     dataField: 'userCreation',
+                //     caption: "Utilisateur création",
+                //     width: 150,
+                //     allowFiltering: true,
+                //     visible: true
+                // }, 
                 {
-                    dataField: 'dateCreation',
-                    caption: "Date creation",
-                    customizeText: renderDateFormat
-                },
-                ,
-                {
-                    dataField: 'userCreation',
-                    caption:  "Utilisateur creation"
-                }, {
                     dataField: 'actif',
-                    caption: "Actif"
-
-                },
-            ]
-            }
-            templates={
-                []
-            }
+                    caption: "Actif",
+                    dataType: 'boolean',
+                    width: 80,
+                    alignment: 'center',
+                    trueText: "Oui",
+                    falseText: "Non",
+                    showEditorAlways: false
+                }
+            ]}
+            templates={[]}
+            allowColumnReordering={true}
+            allowColumnResizing={true}
+            columnAutoWidth={false}
+            showBorders={true}
+            rowAlternationEnabled={true}
+            hoverStateEnabled={true}
+            showRowLines={true}
+            showColumnLines={true}
+            wordWrapEnabled={true}
         />
     )
 }

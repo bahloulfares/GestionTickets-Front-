@@ -1,246 +1,198 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from "react-redux";
-import _ from 'lodash';
+import { Button, Modal, ModalHeader, ModalBody, ModalFooter, Form, FormGroup, Label, Input } from 'reactstrap';
+import { handleClose } from "../../Redux/Actions/Poste/PosteAside";
+import { addNewPoste, editPoste, deletePoste } from "../../Redux/Actions/Poste/Poste";
 import notify from "devextreme/ui/notify";
-import Form, {
-    GroupItem
-} from 'devextreme-react/form';
-import {
-    checkBox_Template,
-    Text_Template,
-    HeaderAside
-} from "../../Helper/editorTemplates";
-import "react-datepicker/dist/react-datepicker.css";
-import 'status-indicator/styles.css';
-import {
-    handleClose,
-    handleOpenModalConfirmation,
-    handleCloseModalConfirmation
-} from "../../Redux/Actions/Poste/PosteAside";
-import {
-    getPosteByCode,
-    addNewPoste,
-    editePoste,
-    deletePoste,
-} from "../../Redux/Actions/Poste/Poste";
-import 'react-confirm-alert/src/react-confirm-alert.css';
-import { modeAsideEnum, constants, classNameObj } from "../../Helper/Enumeration";
-
+import { notifyOptions } from '../../Helper/Config';
 
 const PosteAside = () => {
     const dispatch = useDispatch();
-
+    const PosteAsideReducer = useSelector(state => state.PosteAsideReducer);
     const messages = useSelector(state => state.intl.messages);
-    const intl = useSelector(state => state.intl);
-
-    const isOpen = useSelector(state => state.PosteAsideReducer.isOpen);
-    const modeAside = useSelector(state => state.PosteAsideReducer.modeAside);
-
-    const btnAddInstance = useSelector(state => state.PostesReducer.btnAddInstance);
-    const btnEditionInstance = useSelector(state => state.PostesReducer.btnEditionInstance);
-
-    const selectedPoste = useSelector(state => state.PosteAsideReducer.selectedPoste);
-
-    let objInitialisation = {
-
-        idPoste: selectedPoste ? selectedPoste.idPoste : null,
-        designation: selectedPoste ? selectedPoste.designation : '',
-        actif: selectedPoste ? selectedPoste.actif : true,
-    };
-    let dxForm = useRef(null);
-    let formObj = useRef(objInitialisation);
-    if (selectedPoste && (modeAside === 'CONSULT' || modeAside === 'EDIT' || modeAside === 'VALIDATE'  || modeAside === 'DELETE')) {
-        formObj.current = _.cloneDeep(selectedPoste);
-    }
-
-
-    const validateForm = (e) => {
-        let Poste = _.cloneDeep(formObj.current);
-        let validationForm = e.validationGroup.validate().isValid;
-        let data = {};
-        if (modeAside === 'ADD') {
-            if (validationForm) {
-                data = {
-                    designation: Poste.designation,
-                    actif: Poste.actif,
-
-                };
-                dxForm.current.instance.getEditor('submitAside').option("disabled", true);
-
-                dispatch(addNewPoste(data))
-                    .then(() => {
-                        confirmCloseAside(e);
-                        notify("Success", 'success', 1000);
-                    }).catch(function () {
-                        dxForm.current.instance.getEditor('submitAside').option("disabled", false);
-                    });
-            }
-        } else if (modeAside === 'EDIT') {
-            if (validationForm) {
-                selectedPoste.idPoste = Poste.idPoste;
-                selectedPoste.designation = Poste.designation;
-                selectedPoste.actif = Poste.actif;
-
-                dispatch(editePoste(selectedPoste))
-                    .then(() => {
-                        confirmCloseAside(e);
-                        notify("Success", 'success', 1000);
-                    }).catch(err => {
-                        notify(err, 'error', 500);
-                    });
-            }
-        } else if (modeAside === 'DELETE') {
-            dispatch(deletePoste(selectedPoste.idPoste))
-            .then(() => {
-                confirmCloseAside(e);
-                notify("Success", 'success', 1000);
-            }).catch(err => {
-                notify(err, 'error', 500);
+    
+    const [formData, setFormData] = useState({
+        designation: '',
+        actif: true
+    });
+    
+    useEffect(() => {
+        if (PosteAsideReducer.selectedPoste) {
+            setFormData({
+                idPoste: PosteAsideReducer.selectedPoste.idPoste,
+                designation: PosteAsideReducer.selectedPoste.designation || '',
+                actif: PosteAsideReducer.selectedPoste.actif !== undefined ? PosteAsideReducer.selectedPoste.actif : true,
+                dateCreation: PosteAsideReducer.selectedPoste.dateCreation,
+                userCreation: PosteAsideReducer.selectedPoste.userCreation
+            });
+        } else {
+            setFormData({
+                designation: '',
+                actif: true
             });
         }
+    }, [PosteAsideReducer.selectedPoste]);
+    
+    const handleChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        setFormData({
+            ...formData,
+            [name]: type === 'checkbox' ? checked : value
+        });
     };
-
-    const onInitializedFormGlobal = (e) => {
-        dxForm.current = e.component;
-    }
-    const validateButtonOption = () => {
-        return {
-            icon: 'fa fa-check',
-            onClick: (e) => {
-                intl.loadGrid = true;
-                validateForm(e);
-            },
-            useSubmitBehavior: true
+    
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        
+        if (!formData.designation) {
+            notify("La désignation est obligatoire", "error", notifyOptions);
+            return;
+        }
+        
+        if (PosteAsideReducer.modeAside === 'ADD') {
+            dispatch(addNewPoste(formData))
+                .then(() => {
+                    notify("Poste ajouté avec succès", "success", notifyOptions);
+                    if (PosteAsideReducer.successCallback) {
+                        PosteAsideReducer.successCallback();
+                    }
+                    dispatch(handleClose());
+                })
+                .catch(error => {
+                    notify("Erreur lors de l'ajout du poste", "error", notifyOptions);
+                    console.error(error);
+                });
+        } else if (PosteAsideReducer.modeAside === 'EDIT') {
+            dispatch(editPoste(formData))
+                .then(() => {
+                    notify("Poste modifié avec succès", "success", notifyOptions);
+                    if (PosteAsideReducer.successCallback) {
+                        PosteAsideReducer.successCallback();
+                    }
+                    dispatch(handleClose());
+                })
+                .catch(error => {
+                    notify("Erreur lors de la modification du poste", "error", notifyOptions);
+                    console.error(error);
+                });
+        } else if (PosteAsideReducer.modeAside === 'DELETE') {
+            dispatch(deletePoste(formData.idPoste))
+                .then(() => {
+                    notify("Poste supprimé avec succès", "success", notifyOptions);
+                    if (PosteAsideReducer.successCallback) {
+                        PosteAsideReducer.successCallback();
+                    }
+                    dispatch(handleClose());
+                })
+                .catch(error => {
+                    notify("Erreur lors de la suppression du poste", "error", notifyOptions);
+                    console.error(error);
+                });
         }
     };
-    const clearForm = (e) => {
-        cleanObject();
-    };
-
-    const cleanObject = () => {
-        formObj.current = _.cloneDeep(objInitialisation);
-    };
-
-    const resetButtonOption = () => {
-        return {
-            icon: "fas fa-times",
-            onClick: (e) => {
-                if (modeAside === 'ADD' || modeAside === 'EDIT' || modeAside === 'CONSULT') {
-                    showModalAlert(e, 'closeAside');
-                } else {
-                    confirmCloseAside(e);
-                }
-
-                intl.loadGrid = true;
-            }
+    
+    const getModalTitle = () => {
+        switch (PosteAsideReducer.modeAside) {
+            case 'ADD':
+                return 'Ajouter un poste';
+            case 'EDIT':
+                return 'Modifier un poste';
+            case 'DELETE':
+                return 'Supprimer un poste';
+            case 'CONSULT':
+                return 'Consulter un poste';
+            default:
+                return '';
         }
     };
-    const showModalAlert = (e, actionToDoOnClick) => {
-        let messageToShow = actionToDoOnClick === 'delete' ?
-            messages.WantToDeleteAnyway
-            : `${messages.confirmDialogTextPartOne} ${messages.confirmDialogTextPartTwo}`;
-        const handleBtnConfirmerModalConfirmation = () => {
-            dispatch(handleCloseModalConfirmation());
-            if (actionToDoOnClick === 'delete') {
-                dispatch(deletePoste(selectedPoste.code))
-                    .then(() => {
-                        confirmCloseAside(e);
-                        notify("Success", 'success', 1000);
-
-                    }).catch(err => {
-                        notify(err, 'error', 500);
-                    });
-            } else {
-                confirmCloseAside(e);
-            }
-        }
-        const handleBtnCancelModalConfirmation = () => {
-            dispatch(handleCloseModalConfirmation());
-        }
-        dispatch(handleOpenModalConfirmation(messageToShow, handleBtnCancelModalConfirmation, handleBtnConfirmerModalConfirmation));
-    };
-
-    const confirmCloseAside = (e) => {
-        clearForm(e);
-        dispatch(handleClose());
-    };
-    const RenderDesignation = () => {
-        console.log("RenderDesignation")
-        let obj = {
-            title: "Désignation",
-            dataField: "designation",
-            modeAside: modeAside,
-            maxLength: 200,
-            isRequired: true,
-            colSpan:1,
-            messageRequired: `${messages.designation} ${messages.required}`,
-            disabled: modeAside === 'CONSULT'
-        }
-        return (
-            <GroupItem >
-                {Text_Template(obj)}
-            </GroupItem>
-        )
-    }
-    const RenderActif = () => {
-        console.log("Renderactif")
-        let obj = {
-            title: messages.actif,
-            dataField: "actif",
-            modeAside: modeAside,
-            colSpan:1,
-            disabled: modeAside === 'CONSULT'
-        }
-        return (
-            <GroupItem >
-                {checkBox_Template(obj)}
-            </GroupItem>
-        )
-    }
-
-
+    
     return (
-        <div>
-            {isOpen && modeAside !== '' && (
-                <aside className={"openned"} style={{ overflow: "auto" }}>
-                    <div
-                        className="aside-dialog"
-                        style={{
-                            width: "60%",
-                            display: "table",
-                        }}
+        <Modal
+            isOpen={PosteAsideReducer.isOpen}
+            toggle={() => dispatch(handleClose())}
+            className="modal-dialog-centered"
+            size="md"
+        >
+            <ModalHeader toggle={() => dispatch(handleClose())}>
+                {getModalTitle()}
+            </ModalHeader>
+            <ModalBody>
+                <Form onSubmit={handleSubmit}>
+                    <FormGroup>
+                        <Label for="designation">Désignation</Label>
+                        <Input
+                            type="text"
+                            name="designation"
+                            id="designation"
+                            value={formData.designation}
+                            onChange={handleChange}
+                            disabled={PosteAsideReducer.modeAside === 'CONSULT' || PosteAsideReducer.modeAside === 'DELETE'}
+                            required
+                        />
+                    </FormGroup>
+                    
+                    <FormGroup check>
+                        <Label check>
+                            <Input
+                                type="checkbox"
+                                name="actif"
+                                checked={formData.actif}
+                                onChange={handleChange}
+                                disabled={PosteAsideReducer.modeAside === 'CONSULT' || PosteAsideReducer.modeAside === 'DELETE'}
+                            />{' '}
+                            Actif
+                        </Label>
+                    </FormGroup>
+                    
+                    {/* {(PosteAsideReducer.modeAside === 'CONSULT' || PosteAsideReducer.modeAside === 'EDIT' || PosteAsideReducer.modeAside === 'DELETE') && (
+                        <>
+                            <FormGroup>
+                                <Label for="dateCreation">Date de création</Label>
+                                <Input
+                                    type="text"
+                                    name="dateCreation"
+                                    id="dateCreation"
+                                    value={formData.dateCreation}
+                                    disabled
+                                />
+                            </FormGroup>
+                            
+                            <FormGroup>
+                                <Label for="userCreation">Utilisateur création</Label>
+                                <Input
+                                    type="text"
+                                    name="userCreation"
+                                    id="userCreation"
+                                    value={formData.userCreation}
+                                    disabled
+                                />
+                            </FormGroup>
+                        </>
+                    )} */}
+                    
+                    {PosteAsideReducer.modeAside === 'DELETE' && (
+                        <div className="alert alert-danger mt-3">
+                            Êtes-vous sûr de vouloir supprimer ce poste ?
+                        </div>
+                    )}
+                </Form>
+            </ModalBody>
+            <ModalFooter>
+                <Button color="secondary" onClick={() => dispatch(handleClose())}>
+                    Annuler
+                </Button>
+                {PosteAsideReducer.modeAside !== 'CONSULT' && (
+                    <Button 
+                        color={PosteAsideReducer.modeAside === 'DELETE' ? 'danger' : 'primary'} 
+                        onClick={handleSubmit}
                     >
-                        <Form
-                            ref={dxForm}
-                            key={'formCreatePoste'}
-                            formData={formObj.current}
-                            onInitialized={onInitializedFormGlobal}
-                            colCount={1}
-                            style={{
-                                width: "85%",
-                                display: "table-row"
-                            }}
-                        >
-                            {HeaderAside({
-                                modeAside: modeAside,
-                                btnValider: validateButtonOption(),
-                                btnReset: resetButtonOption(),
-                                messages: messages
-                            })}
-                            (
-                            <GroupItem>
-                                <GroupItem colCount={2}>
-                                    {RenderDesignation()}
-                                    {RenderActif()}
-                                </GroupItem>
-                            </GroupItem>
-                            )
-
-                        </Form>
-                    </div>
-                </aside>
-            )}
-        </div>
+                        {PosteAsideReducer.modeAside === 'ADD' ? 'Ajouter' : 
+                         PosteAsideReducer.modeAside === 'EDIT' ? 'Modifier' : 'Supprimer'}
+                    </Button>
+                )}
+            </ModalFooter>
+        </Modal>
     );
-}
+};
+
 export default PosteAside

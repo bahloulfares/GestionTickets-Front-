@@ -177,9 +177,7 @@ const UtilisateurGrid = () => {
                 {
                     dataField: 'poste.designation',
                     caption: "Poste"
-
                 },
-                ,
                 {
                     dataField: 'username',
                     caption: "Login"
@@ -189,20 +187,24 @@ const UtilisateurGrid = () => {
                     caption: "Date creation",
                     customizeText: renderDateFormat
                 },
-                ,
                 {
                     dataField: 'userCreation',
-                    caption:  "Utilisateur creation"
-                }, {
+                    caption: "Utilisateur creation"
+                }, 
+                {
                     dataField: 'actif',
                     caption: "Actif"
-
                 },
-            ]
-            }
-            templates={
-                []
-            }
+                {
+                    dataField: 'nom',
+                    caption: "Nom"
+                },
+                {
+                    dataField: 'prenom',
+                    caption: "Prénom"
+                }
+            ]}
+            templates={[]}
         />
     )
 }

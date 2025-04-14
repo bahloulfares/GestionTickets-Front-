@@ -21,7 +21,18 @@ module.exports = {
     devServer: {
         contentBase: path.join(__dirname, 'src'),
         hot: true,
-        historyApiFallback: true
+        historyApiFallback: true,
+        // Configuration du proxy pour résoudre le problème CORS
+        proxy: {
+            '/template-core': {
+                target: 'http://localhost:9500',
+                secure: false,
+                changeOrigin: true,
+                headers: {
+                    Connection: 'keep-alive'
+                }
+            }
+        }
     },
     node: {
         dns: 'mock',

@@ -4,12 +4,8 @@ import {
     SHOW_ASIDE_ADD_MODE_POSTE,
     SHOW_ASIDE_EDIT_MODE_POSTE,
     SHOW_ASIDE_DELETE_MODE_POSTE,
-    SHOW_ASIDE_CONSULT_MODE_POSTE,
-    SHOW_MODAL_CONFIRMATION_POSTE,
-    CLOSE_MODAL_CONFIRMATION_POSTE
+    SHOW_ASIDE_CONSULT_MODE_POSTE
 } from "../../Constants/Poste/PosteAside";
-import axios from "axios";
-import Ressources from '../../../Helper/Ressources';
 
 export const handleOpenAddMode = (successCallback) => {
     return dispatch => {
@@ -20,11 +16,11 @@ export const handleOpenAddMode = (successCallback) => {
     }
 }
 
-export const handleOpenConsultMode = (selectedPoste) => {
+export const handleOpenConsultMode = (selectedPoste, successCallback) => {
     return dispatch => {
         dispatch({
             type: SHOW_ASIDE_CONSULT_MODE_POSTE,
-            payload: selectedPoste
+            payload: {selectedPoste: selectedPoste, successCallback: successCallback}
         });
     }
 }
@@ -55,31 +51,10 @@ export const handleClose = () => {
     }
 }
 
-export const clearForm = () => {
+export const handleReset = () => {
     return dispatch => {
         dispatch({
             type: RESET_ASIDE_POSTE
-        });
-    }
-}
-
-
-
-export const handleOpenModalConfirmation = (messageToShow, handleBtnCancelModalConfirmation, handleBtnConfirmerModalConfirmation) => {
-    return dispatch => {
-        dispatch({
-            type: SHOW_MODAL_CONFIRMATION_POSTE,
-            messageToShow: messageToShow,
-            actionBtnModalConfirmation: {handleBtnCancelModalConfirmation, handleBtnConfirmerModalConfirmation}
-        });
-    }
-}
-
-export const handleCloseModalConfirmation = (successCallback) => {
-    return dispatch => {
-        dispatch({
-            type: CLOSE_MODAL_CONFIRMATION_POSTE,
-            payload: successCallback
         });
     }
 }

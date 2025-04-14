@@ -9,13 +9,8 @@ import {
 const initialState = {
     allUtilisateur: [],
     selectedUtilisateur: null,
-    btnAddInstance: null,
-    btnConsultInstance: null,
-    btnEditInstance: null,
-    btnDeleteInstance: null,
-    btnEditionInstance: null,
-    dateDebut: null,
-    dateFin: null 
+    loading: false,
+    error: null
 };
 
 const UtilisateursReducer = (state = initialState, action) => {
@@ -23,32 +18,40 @@ const UtilisateursReducer = (state = initialState, action) => {
         case GET_ALL_UTILISATEUR:
             return {
                 ...state,
-                allUtilisateur: action.payload
+                allUtilisateur: action.payload,
+                error: null
             };
         case GET_UTILISATEUR_BY_CODE:
             return {
                 ...state,
-                selectedUtilisateur: action.payload
+                selectedUtilisateur: action.payload,
+                error: null
             };
         case ADD_NEW_UTILISATEUR:
             return {
                 ...state,
                 allUtilisateur: [...state.allUtilisateur, action.payload],
-
+                error: null
             };
         case EDIT_UTILISATEUR:
             return {
                 ...state,
-                allUtilisateur: [...state.allUtilisateur, action.payload]
+                allUtilisateur: state.allUtilisateur.map(user => 
+                    user.username === action.payload.username ? action.payload : user
+                ),
+                selectedUtilisateur: action.payload,
+                error: null
             };
         case DELETE_UTILISATEUR:
             return {
                 ...state,
-                allUtilisateur: [...state.allUtilisateur, action.payload]
-            }; 
-
+                allUtilisateur: state.allUtilisateur.filter(user => user.username !== action.payload),
+                selectedUtilisateur: null,
+                error: null
+            };
         default:
             return state;
     }
-}
+};
+
 export default UtilisateursReducer;

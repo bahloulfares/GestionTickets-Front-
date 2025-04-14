@@ -1,30 +1,49 @@
 import axios from 'axios';
 import Ressources from '../../../Helper/Ressources';
-import { GET_ALL_UTILISATEUR, ADD_NEW_UTILISATEUR,DELETE_UTILISATEUR, EDIT_UTILISATEUR, GET_UTILISATEUR_BY_CODE } from "../../Constants/Utilisateur/Utilisateur";
+import { GET_ALL_UTILISATEUR, ADD_NEW_UTILISATEUR, DELETE_UTILISATEUR, EDIT_UTILISATEUR, GET_UTILISATEUR_BY_CODE } from "../../Constants/Utilisateur/Utilisateur";
 
- export const getAllUtilisateurs = (dataGrid) => {
+export const getAllUtilisateurs = (dataGrid) => {
     return dispatch => {
-        dataGrid.instance.beginCustomLoading();
-        axios.get(`${Ressources.CoreUrlB}/${Ressources.compteClient.api}/${Ressources.compteClient.utilisateurs}`).then(res => {
-            dispatch({
-                type: GET_ALL_UTILISATEUR,
-                payload: res.data
+        if (dataGrid && dataGrid.instance) {
+            dataGrid.instance.beginCustomLoading();
+        }
+        
+        return axios.get(`${Ressources.CoreUrlB}/api/users`)
+            .then(res => {
+                dispatch({
+                    type: GET_ALL_UTILISATEUR,
+                    payload: res.data
+                });
+                
+                if (dataGrid && dataGrid.instance) {
+                    dataGrid.instance.endCustomLoading();
+                }
+                
+                return res.data;
+            })
+            .catch(error => {
+                console.error("Erreur lors de la récupération des utilisateurs:", error);
+                if (dataGrid && dataGrid.instance) {
+                    dataGrid.instance.endCustomLoading();
+                }
+                throw error;
             });
-            dataGrid.instance.endCustomLoading();
-        })
-    }
-}; 
+    };
+};
 
-export const getUtilisateurByCode = (code) => {
+export const getUtilisateurByCode = (username) => {
     return dispatch => {
         return new Promise((resolve, reject) => {
-            axios.get(`${Ressources.CoreUrlB}/${Ressources.compteClient.api}/${Ressources.compteClient.utilisateurs}/${encodeURI(code)}`)
+            axios.get(`${Ressources.CoreUrlB}/api/users/${encodeURIComponent(username)}`)
                 .then(res => {
                     dispatch({
                         type: GET_UTILISATEUR_BY_CODE,
                         payload: res.data
                     });
                     resolve(res.data);
+                })
+                .catch(error => {
+                    reject(error);
                 });
         });
     }
@@ -33,49 +52,75 @@ export const getUtilisateurByCode = (code) => {
 export const addNewUtilisateur = (data) => {
     return dispatch => {
         return new Promise((resolve, reject) => {
-            axios.post(`${Ressources.CoreUrlB}/${Ressources.compteClient.api}/${Ressources.compteClient.utilisateurs}`, data)
+            // Adapter le format des données au format attendu par l'API
+            const userDTO = {
+                username: data.username,
+                password: data.password,
+                nom: data.nom,
+                prenom: data.prenom,
+                description: data.description,
+                role: data.role,
+                actif: data.actif === true || data.actif === 1,
+                idPoste: data.id_poste
+            };
+            
+            axios.post(`${Ressources.CoreUrlB}/api/users`, userDTO)
                 .then(res => {
                     dispatch({
                         type: ADD_NEW_UTILISATEUR,
                         payload: res.data
                     });
-
                     resolve(res.data);
-                }).catch(function (error) {
+                })
+                .catch(error => {
                     reject(error);
                 });
         });
     }
 };
 
-export const editeUtilisateur = (data) => {
+export const editUtilisateur = (data) => {
     return dispatch => {
         return new Promise((resolve, reject) => {
-            axios.put(`${Ressources.CoreUrlB}/${Ressources.compteClient.api}/${Ressources.compteClient.utilisateurs}/${data.username}`, data)
+            // Adapter le format des données au format attendu par l'API
+            const userDTO = {
+                username: data.username,
+                password: data.password,
+                nom: data.nom,
+                prenom: data.prenom,
+                description: data.description,
+                role: data.role,
+                actif: data.actif === true || data.actif === 1,
+                idPoste: data.id_poste
+            };
+            
+            axios.put(`${Ressources.CoreUrlB}/api/users`, userDTO)
                 .then(res => {
                     dispatch({
                         type: EDIT_UTILISATEUR,
-                        payload: data
+                        payload: res.data
                     });
-                    resolve(true);
-                }).catch(function (error) {
+                    resolve(res.data);
+                })
+                .catch(error => {
                     reject(error);
                 });
         });
     }
 };
 
-export const deleteUtilisateur = (code) => {
+export const deleteUtilisateur = (username) => {
     return dispatch => {
         return new Promise((resolve, reject) => {
-            axios.delete(`${Ressources.CoreUrlB}/${Ressources.compteClient.api}/${Ressources.compteClient.utilisateurs}/${code}`)
+            axios.delete(`${Ressources.CoreUrlB}/api/users/${encodeURIComponent(username)}`)
                 .then(res => {
                     dispatch({
                         type: DELETE_UTILISATEUR,
-                        payload: code
+                        payload: username
                     });
                     resolve(true);
-                }).catch(function (error) {
+                })
+                .catch(error => {
                     reject(error);
                 });
         });
