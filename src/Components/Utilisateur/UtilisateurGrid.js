@@ -17,10 +17,11 @@ import { loadMessages } from "devextreme/localization";
 import arMessages from "../../i18n/datagrid_ar.json";
 import enMessages from "devextreme/localization/messages/en";
 import frMessages from "devextreme/localization/messages/fr";
-import { getUtilisateurByCode } from "../../Redux/Actions/Utilisateur/Utilisateur";
+import { getAllUtilisateurs, getUtilisateurByCode } from "../../Redux/Actions/Utilisateur/Utilisateur";
 import Helper from '../../Helper/Helper';
 import HelperGrid from '../../Helper/HelperGrid';
 import TableGrid from '../ComponentHelper/TableGrid';
+import { getRoleLabel } from '../../Helper/Enums/Role';
 
 loadMessages(arMessages);
 loadMessages(enMessages);
@@ -28,7 +29,6 @@ loadMessages(frMessages);
 
 let selectionChangedRaised;
 const UtilisateurGrid = () => {
-
     const dispatch = useDispatch();
     const UtilisateursReducer = useSelector(state => state.UtilisateursReducer);
     const messages = useSelector(state => state.intl.messages);
@@ -38,6 +38,7 @@ const UtilisateurGrid = () => {
         selectionChangedRaised = true;
         HelperGrid.handleSelectionChanged(selectedRowsData, UtilisateursReducer);
     };
+    
     const onRowClick = e => {
         if (!selectionChangedRaised) {
             let dataGrid = e.component;
@@ -47,11 +48,7 @@ const UtilisateurGrid = () => {
         }
         selectionChangedRaised = false;
     };
-    /**
-     * 
-     * @param {*} e 
-     * obj filtres.select : select Utilisateur
-     */
+    
     const onToolbarPreparing = (e) => {
         let filtres = {
             filterRemove: {
@@ -64,6 +61,7 @@ const UtilisateurGrid = () => {
             },
             refresh: {
                 visible: true,
+                action: onClickBtnRefresh
             },
             add: {
                 visible: true,
@@ -81,127 +79,115 @@ const UtilisateurGrid = () => {
                 visible: true,
                 action: onClickBtnDelete
             },
-            editionList: {
-                visible: true,
-                action: onClickBtnEditionList
-            },
-            edition: {
-                visible: true,
-                action: onClickBtnEdition
-            },
             export_excel: {
                 visible: true
             }
         }
         HelperGrid.handleToolbarPreparing(e, dataGrid, buttons, filtres, UtilisateursReducer)
     }
+    
     const onClickBtnAdd = () => {
         dispatch(handleOpenAddMode(refreshDataGrid))
     }
+    
     const onClickBtnEdit = () => {
         if (dataGrid.current !== null) {
             let dataGridInstance = dataGrid.current.instance;
             let selectedRowKeys = dataGridInstance.getSelectedRowKeys()[0];
             dispatch(getUtilisateurByCode(selectedRowKeys))
                 .then((data) => {
-                        dispatch(handleOpenEditMode(data, refreshDataGrid))
+                    dispatch(handleOpenEditMode(data, refreshDataGrid))
                 })
         }
     }
+    
     const onClickBtnConsult = () => {
         if (dataGrid.current !== null) {
             let dataGridInstance = dataGrid.current.instance;
             let selectedRowKeys = dataGridInstance.getSelectedRowKeys()[0];
             dispatch(getUtilisateurByCode(selectedRowKeys))
                 .then((data) =>
-                    dispatch(handleOpenConsultMode(data, refreshDataGrid))
+                    dispatch(handleOpenConsultMode(data))
                 )
         }
     }
+    
     const onClickBtnDelete = () => {
         if (dataGrid.current !== null) {
             let dataGridInstance = dataGrid.current.instance;
             let selectedRowKeys = dataGridInstance.getSelectedRowKeys()[0];
             dispatch(getUtilisateurByCode(selectedRowKeys))
                 .then((data) => {
-                        dispatch(handleOpenDeleteMode(data, refreshDataGrid))
-                }
-                )
+                    dispatch(handleOpenDeleteMode(data, refreshDataGrid))
+                })
         }
     }
-    const onClickBtnEditionList = () => {
-        dispatch(handleOpenModal())
-        let du = UtilisateursReducer.dateDebut;
-        let au = UtilisateursReducer.dateFin;
-        let url = `${Ressources.CoreUrlB}/${Ressources.compteClient.api}/${Ressources.compteClient.utilisateurs}/edition/listeUtilisateurs?du=${du}&au=${au}`;
-        impression(url);
+    
+    const onClickBtnRefresh = () => {
+        refreshDataGrid();
     }
-    const onClickBtnEdition = () => {
-        if (dataGrid.current !== null) {
-            let dataGridInstance = dataGrid.current.instance;
-            let selectedRowKeys = dataGridInstance.getSelectedRowKeys()[0];
-            dispatch(handleOpenModal())
-            let url = `${Ressources.CoreUrlB}/${Ressources.compteClient.api}/${Ressources.compteClient.utilisateurs}/edition/${selectedRowKeys}`;
-            impression(url);
-        }
-    }
+    
     const refreshDataGrid = () => {
-        if (dataGrid.current !== null)
-            dataGrid.current.instance.refresh();
-    }
-    const renderDateFormat = (data) => {
-        return Helper.formatDate(data.value);
-    };
-    async function impression(url) {
-        const response = await fetch(url);
-        const blob = await response.blob();
-        componentImpression(blob);
-
-    }
-    const componentImpression = (blob) => {
-        let url = URL.createObjectURL(blob);
-        document.getElementById('iframe_content').src = url;
+        if (dataGrid.current !== null) {
+            dispatch(getAllUtilisateurs(dataGrid.current));
+        }
     }
 
     return (
         <TableGrid
             dataGrid={dataGrid}
             keyExpr='username'
-            customStore={HelperGrid.constructCustomStore(`${`${Ressources.CoreUrlB}/${Ressources.compteClient.api}/${Ressources.compteClient.utilisateurs}`}`,
-                'username')}
+            customStore={HelperGrid.constructCustomStore(
+                `${Ressources.CoreUrlB}/${Ressources.compteClient.api}/${Ressources.compteClient.utilisateurs}`,
+                'username'
+            )}
             onToolbarPreparing={onToolbarPreparing}
             onSelectionChanged={onSelectionChanged}
             onRowClick={onRowClick}
-            fileName={messages.Utilisateurs}
+            fileName={messages.Utilisateurs || "Utlisateurs"}
             columns={[
-                {
-                    dataField: 'poste.designation',
-                    caption: "Poste"
+                { 
+                    dataField: 'username', 
+                    caption: messages.Username || "Username",
+                    dataType: 'string',
+                    allowSorting: true,
+                    allowFiltering: true
                 },
-                {
-                    dataField: 'username',
-                    caption: "Login"
+                { 
+                    dataField: 'nom', 
+                    caption: messages.LastName || "Last Name",
+                    dataType: 'string',
+                    allowSorting: true,
+                    allowFiltering: true
                 },
-                {
-                    dataField: 'dateCreation',
-                    caption: "Date creation",
-                    customizeText: renderDateFormat
+                { 
+                    dataField: 'prenom', 
+                    caption: messages.FirstName || "First Name",
+                    dataType: 'string',
+                    allowSorting: true,
+                    allowFiltering: true
                 },
-                {
-                    dataField: 'userCreation',
-                    caption: "Utilisateur creation"
-                }, 
-                {
-                    dataField: 'actif',
-                    caption: "Actif"
+                { 
+                    dataField: 'role', 
+                    caption: messages.Role || "Role",
+                    dataType: 'string',
+                    allowSorting: true,
+                    allowFiltering: true,
+                    calculateCellValue: (data) => getRoleLabel(data.role)
                 },
-                {
-                    dataField: 'nom',
-                    caption: "Nom"
+                { 
+                    dataField: 'poste.designation', 
+                    caption: messages.Position || "Position",
+                    dataType: 'string',
+                    allowSorting: true,
+                    allowFiltering: true
                 },
-                {
-                    dataField: 'prenom',
-                    caption: "Prénom"
+                { 
+                    dataField: 'actif', 
+                    caption: messages.Active || "Active",
+                    dataType: 'boolean',
+                    allowSorting: true,
+                    allowFiltering: true
                 }
             ]}
             templates={[]}
@@ -209,4 +195,4 @@ const UtilisateurGrid = () => {
     )
 }
 
-export default UtilisateurGrid
+export default UtilisateurGrid;

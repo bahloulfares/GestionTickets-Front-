@@ -1,152 +1,70 @@
-import axios from 'axios';
-import Ressources from '../../../Helper/Ressources';
-import { 
-    LOGIN, 
-    LOGOUT, 
-    LOGIN_REQUEST, 
-    LOGIN_SUCCESS, 
-    LOGIN_FAILURE,
-    AUTH_CHECK,
-    AUTH_CHECK_SUCCESS,
-    AUTH_CHECK_FAILURE
-} from "../../Constants/Login/Login";
+import {
+  LOGIN_REQUEST,
+  LOGIN_SUCCESS, 
+  LOGIN_FAILURE,
+  AUTH_CHECK, 
+  AUTH_CHECK_SUCCESS, 
+  AUTH_CHECK_FAILURE,
+  LOGOUT
+} from '../../Constants/Login/Login';
+import AuthService from '../../../Services/AuthService';
 
-// Amélioration de la fonction signIn
-export const signIn = (email, password) => {
-    return function(dispatch) {
-        dispatch({ type: LOGIN_REQUEST });
-        
-        return new Promise((resolve, reject) => {
-            axios.post(`${Ressources.CoreUrlB}/template-core/login?username=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}&submit=Login`)
-                .then(res => {
-                    const authToken = res.headers['x-auth-token'];
-                    if (authToken) {
-                        localStorage.setItem("x-auth-token", authToken);
-                        // Mettre à jour les headers d'axios pour les futures requêtes
-                        axios.defaults.headers.common['Authorization'] = authToken;
-                        axios.defaults.headers.common['x-auth-token'] = authToken;
-                    }
-                    
-                    dispatch({
-                        type: LOGIN_SUCCESS,
-                        payload: email
-                    });
-                    resolve(true);
-                }).catch(function (error) {
-                    const errorMessage = error.response?.data?.message || error.message;
-                    dispatch({
-                        type: LOGIN_FAILURE,
-                        payload: errorMessage
-                    });
-                    reject(error);
-                });
-        });
-    }
-}
-
-// Amélioration de la fonction logOut
-export const logOut = () => {
-    return function(dispatch) {
-        return new Promise((resolve, reject) => {
-            const token = localStorage.getItem("x-auth-token");
-            if (!token) {
-                // Si pas de token, on nettoie quand même et on résout
-                performLogout(dispatch);
-                resolve(true);
-                return;
-            }
-            
-            const config = {
-                headers: {
-                    'X-Auth-Token': token
-                }
-            };
-            
-            axios.post(`${Ressources.CoreUrlB}/template-core/logout`, {}, config)
-                .then(res => {
-                    performLogout(dispatch);
-                    resolve(true);
-                }).catch(function (error) {
-                    performLogout(dispatch);
-                    reject(error);
-                });
-        });
-    }
-}
-
-// Fonction utilitaire pour effectuer le logout
-const performLogout = (dispatch) => {
-    localStorage.removeItem("x-auth-token");
-    // Nettoyer les headers d'axios
-    delete axios.defaults.headers.common['Authorization'];
-    delete axios.defaults.headers.common['x-auth-token'];
+export const signIn = (username, password) => async (dispatch) => {
+  try {
+    dispatch({ type: LOGIN_REQUEST });
     
-    if (typeof dispatch === 'function') {
-        dispatch({
-            type: LOGOUT,
-            payload: ""
-        });
-    }
+    // Appel à la méthode de connexion du service
+    const user = await AuthService.login(username, password);
     
-    window.location.href = '/';
+    // Dispatch de l'action de succès avec les données utilisateur
+    dispatch({ type: LOGIN_SUCCESS, payload: user });
+    
+    return user;
+  } catch (error) {
+    console.error('Erreur lors de la connexion:', error);
+    
+    // Dispatch de l'action d'échec avec le message d'erreur
+    dispatch({ 
+      type: LOGIN_FAILURE, 
+      payload: error.message || 'Erreur lors de la connexion' 
+    });
+    
+    throw error;
+  }
 };
 
-export const checkAuthentication = () => {
-    return function(dispatch) {
-        // Dispatch check action
-        dispatch({ type: AUTH_CHECK });
-        
-        return new Promise((resolve, reject) => {
-            const token = localStorage.getItem("x-auth-token");
-            
-            if (!token) {
-                dispatch({
-                    type: AUTH_CHECK_FAILURE,
-                    payload: "No token found"
-                });
-                resolve(false);
-                return;
-            }
-            
-            const config = {
-                headers: {
-                    'X-Auth-Token': token
-                }
-            };
-            
-            axios.get(`${Ressources.CoreUrlB}/template-core/api/users/is-authenticated`, config)
-                .then(res => {
-                    if (res.status === 200) {
-                        dispatch({
-                            type: AUTH_CHECK_SUCCESS,
-                            payload: res.data.username
-                        });
-                        resolve(true);
-                    } else {
-                        localStorage.removeItem("x-auth-token");
-                        dispatch({
-                            type: AUTH_CHECK_FAILURE,
-                            payload: "Authentication failed"
-                        });
-                        resolve(false);
-                    }
-                }).catch(function (error) {
-                    localStorage.removeItem("x-auth-token");
-                    dispatch({
-                        type: AUTH_CHECK_FAILURE,
-                        payload: error.message
-                    });
-                    resolve(false);
-                });
-        });
-    }
-}
+export const checkAuthentication = () => async (dispatch) => {
+  try {
+    dispatch({ type: AUTH_CHECK });
+    
+    // Vérification de l'authentification
+    const user = await AuthService.checkAuthentication();
+    
+    // Dispatch de l'action de succès avec les données utilisateur
+    dispatch({ type: AUTH_CHECK_SUCCESS, payload: user });
+    
+    return user;
+  } catch (error) {
+    console.error('Erreur lors de la vérification de l\'authentification:', error);
+    
+    // Dispatch de l'action d'échec avec le message d'erreur
+    dispatch({ type: AUTH_CHECK_FAILURE, payload: error.message });
+    
+    throw error;
+  }
+};
 
-// Fonction utilitaire pour vérifier si l'utilisateur est authentifié
-export const isUserAuthenticated = () => {
-    return !!localStorage.getItem("x-auth-token");
-}
-
-
-
-
+// Add this export for the logout function
+export const logOut = () => (dispatch) => {
+  // Clear user data from localStorage
+  localStorage.removeItem('authToken');
+  localStorage.removeItem('userData');
+  localStorage.removeItem('isAuthenticated');
+  localStorage.removeItem('rememberedUser');
+  
+  // Dispatch logout action to Redux
+  dispatch({ type: LOGOUT });
+  
+  // Redirect to login page
+  window.location.href = '/';
+};

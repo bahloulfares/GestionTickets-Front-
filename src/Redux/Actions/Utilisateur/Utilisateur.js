@@ -8,7 +8,7 @@ export const getAllUtilisateurs = (dataGrid) => {
             dataGrid.instance.beginCustomLoading();
         }
         
-        return axios.get(`${Ressources.CoreUrlB}/api/users`)
+        return axios.get(`${Ressources.CoreUrlB}/template-core/api/users`)
             .then(res => {
                 dispatch({
                     type: GET_ALL_UTILISATEUR,
@@ -34,7 +34,7 @@ export const getAllUtilisateurs = (dataGrid) => {
 export const getUtilisateurByCode = (username) => {
     return dispatch => {
         return new Promise((resolve, reject) => {
-            axios.get(`${Ressources.CoreUrlB}/api/users/${encodeURIComponent(username)}`)
+            axios.get(`${Ressources.CoreUrlB}/template-core/api/users/${encodeURIComponent(username)}`)
                 .then(res => {
                     dispatch({
                         type: GET_UTILISATEUR_BY_CODE,
@@ -59,12 +59,16 @@ export const addNewUtilisateur = (data) => {
                 nom: data.nom,
                 prenom: data.prenom,
                 description: data.description,
-                role: data.role,
-                actif: data.actif === true || data.actif === 1,
-                idPoste: data.id_poste
+                role: data.role, // Assurez-vous que c'est au format ROLE_ADMIN ou ROLE_AUTRE
+                poste: data.poste ? {
+                    idPoste: data.poste.idPoste,
+                    designation: data.poste.designation
+                } : null,
+                actif: data.actif
             };
-            
-            axios.post(`${Ressources.CoreUrlB}/api/users`, userDTO)
+            console.log("userDTO envoyé :", userDTO);
+ 
+            axios.post(`${Ressources.CoreUrlB}/template-core/api/users/`, userDTO)
                 .then(res => {
                     dispatch({
                         type: ADD_NEW_UTILISATEUR,
@@ -73,6 +77,7 @@ export const addNewUtilisateur = (data) => {
                     resolve(res.data);
                 })
                 .catch(error => {
+                    console.error("Erreur lors de l'ajout d'utilisateur:", error.response ? error.response.data : error);
                     reject(error);
                 });
         });
@@ -85,16 +90,21 @@ export const editUtilisateur = (data) => {
             // Adapter le format des données au format attendu par l'API
             const userDTO = {
                 username: data.username,
-                password: data.password,
+                password: data.password || undefined, // Ne pas envoyer le mot de passe s'il est vide
                 nom: data.nom,
                 prenom: data.prenom,
                 description: data.description,
-                role: data.role,
-                actif: data.actif === true || data.actif === 1,
-                idPoste: data.id_poste
+                role: data.role, // Assurez-vous que c'est au format ROLE_ADMIN ou ROLE_AUTRE
+                poste: data.poste ? {
+                    idPoste: data.poste.idPoste,
+                    designation: data.poste.designation
+                } : null,
+                actif: data.actif
             };
             
-            axios.put(`${Ressources.CoreUrlB}/api/users`, userDTO)
+            console.log("userDTO pour modification :", userDTO);
+            
+            axios.put(`${Ressources.CoreUrlB}/template-core/api/users/${encodeURIComponent(data.username)}`, userDTO)
                 .then(res => {
                     dispatch({
                         type: EDIT_UTILISATEUR,
@@ -103,6 +113,7 @@ export const editUtilisateur = (data) => {
                     resolve(res.data);
                 })
                 .catch(error => {
+                    console.error("Erreur lors de la modification d'utilisateur:", error.response ? error.response.data : error);
                     reject(error);
                 });
         });
@@ -112,13 +123,13 @@ export const editUtilisateur = (data) => {
 export const deleteUtilisateur = (username) => {
     return dispatch => {
         return new Promise((resolve, reject) => {
-            axios.delete(`${Ressources.CoreUrlB}/api/users/${encodeURIComponent(username)}`)
+            axios.delete(`${Ressources.CoreUrlB}/template-core/api/users/${encodeURIComponent(username)}`)
                 .then(res => {
                     dispatch({
                         type: DELETE_UTILISATEUR,
                         payload: username
                     });
-                    resolve(true);
+                    resolve(res.data);
                 })
                 .catch(error => {
                     reject(error);

@@ -10,7 +10,7 @@ const module = {
     compteClient: {
         api: "template-core/api",       
         postes: "postes",
-        utilisateurs: "utilisateurs",
+        utilisateurs: "users",
         modules: "modules",  
         clients: 'clients'
     }

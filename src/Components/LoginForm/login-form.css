@@ -1,28 +1,35 @@
 
 
-  .link {
-    text-align: center;
-    font-size: 16px;
-    font-style: normal;
-  }
-
-  .link a {
-      text-decoration: none;
-    }
-
-    .link .form-text {
-    margin: 10px 0;
-    color: rgba(#fff, alpha(#fff) * 0.7);
-  }
-  .login-form{
-    width: 30%;
-    margin: auto;
-    margin-top: 15%;
+.link {
+  text-align: center;
+  font-size: 16px;
+  font-style: normal;
 }
-  
-.logo{
+
+.link a {
+  text-decoration: none;
+}
+
+.link .form-text {
+  margin: 10px 0;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.login-form {
+  width: 30%;
+  margin: auto;
+  margin-top: 15%;
+}
+
+.logo {
   height: 23px;
   margin: 15px 15px 15px 70px;
+  text-align: center;
+}
+
+.login-error {
+  color: #f00;
+  margin-top: 10px;
   text-align: center;
 }
 

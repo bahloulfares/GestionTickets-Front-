@@ -1,88 +1,81 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
+import { Route, Switch, Redirect } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import MenuTabs from './Components/MenuTabs/MenuTabs';
 import LoginForm from './Components/LoginForm/LoginForm';
 import { checkAuthentication } from './Redux/Actions/Login/Login';
 
-// Helper function to check authentication status
+// Helper hook pour récupérer les infos d'authentification
 const useAuthStatus = () => {
   const isAuthenticated = useSelector(state => state.LoginReducer.isAuthenticated);
   const userAuthentification = useSelector(state => state.LoginReducer.userAuthentification);
   return { isAuthenticated, userAuthentification };
 };
 
-// Composant PrivateRoute pour protéger les routes qui nécessitent une authentification
+// Composant PrivateRoute
 const PrivateRoute = ({ component: Component, ...rest }) => {
-  const { isAuthenticated, userAuthentification } = useAuthStatus();
-  
-  return (
-    <Route
-      {...rest}
-      render={props =>
-        isAuthenticated && userAuthentification ? (
-          <Component {...props} />
-        ) : (
-          <Redirect to="/" />
-        )
-      }
-    />
-  );
-};
-
-// Ajout de la validation des props
-PrivateRoute.propTypes = {
-  component: PropTypes.elementType.isRequired
-};
-
-// Composant PublicRoute pour les routes accessibles sans authentification
-const PublicRoute = ({ component: Component, restricted, ...rest }) => {
-  const { isAuthenticated, userAuthentification } = useAuthStatus();
-  
-  return (
-    <Route
-      {...rest}
-      render={props =>
-        isAuthenticated && userAuthentification && restricted ? (
-          <Redirect to="/dashboard" />
-        ) : (
-          <Component {...props} />
-        )
-      }
-    />
-  );
-};
-
-// Ajout de la validation des props
-PublicRoute.propTypes = {
-  component: PropTypes.elementType.isRequired,
-  restricted: PropTypes.bool
-};
-
-export const Router = () => {
+  const { isAuthenticated } = useAuthStatus();
+  const [isChecking, setIsChecking] = useState(true);
   const dispatch = useDispatch();
-  
-  // Vérifier l'authentification au chargement du composant
+
   useEffect(() => {
-    dispatch(checkAuthentication());
+    // Vérifier l'authentification au chargement de la route
+    const checkAuth = async () => {
+      try {
+        // Vérifier si un token est présent dans localStorage
+        const token = localStorage.getItem('authToken');
+        
+        if (token) {
+          await dispatch(checkAuthentication());
+        }
+        
+        setIsChecking(false);
+      } catch (error) {
+        console.error("Erreur lors de la vérification de l'authentification:", error);
+        setIsChecking(false);
+      }
+    };
+
+    checkAuth();
   }, [dispatch]);
-  
+
+  if (isChecking) {
+    // Afficher un indicateur de chargement pendant la vérification
+    return <div className="loading-indicator">Chargement...</div>;
+  }
+
   return (
-    <BrowserRouter>
-      <Switch>
-        {/* Route publique restreinte (redirige vers /dashboard si déjà connecté) */}
-        <PublicRoute restricted={true} exact path="/" component={LoginForm} />
-        
-        {/* Routes privées (nécessitent une authentification) */}
-        <PrivateRoute path="/dashboard" component={MenuTabs} />
-        
-        {/* Redirection par défaut */}
-        <Redirect to="/" />
-      </Switch>
-    </BrowserRouter>
+    <Route
+      {...rest}
+      render={props =>
+        isAuthenticated ? (
+          <Component {...props} />
+        ) : (
+          <Redirect
+            to={{
+              pathname: "/",
+              state: { from: props.location }
+            }}
+          />
+        )
+      }
+    />
   );
 };
 
-export default Router;
+PrivateRoute.propTypes = {
+  component: PropTypes.elementType.isRequired,
+  location: PropTypes.object
+};
 
+// Composant principal du routeur
+export const Router = () => {
+  return (
+    <Switch>
+      <Route exact path="/" component={LoginForm} />
+      <PrivateRoute path="/dashboard" component={MenuTabs} />
+      <Redirect to="/" />
+    </Switch>
+  );
+};

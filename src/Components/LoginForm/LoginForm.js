@@ -1,4 +1,4 @@
-import React, { useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import Form, {
   Item,
   Label,
@@ -8,12 +8,17 @@ import Form, {
 } from 'devextreme-react/form';
 import LoadIndicator from 'devextreme-react/load-indicator';
 import { signIn } from '../../Redux/Actions/Login/Login';
-
+import { LOGIN_FAILURE } from '../../Redux/Constants/Login/Login';
 import './login-form.css';
 import { useSelector, useDispatch } from 'react-redux';
 import logo from '../../assests/css/images/logo_csys.png';
 
-function LoginForm() {
+// Configuration des éditeurs
+const emailEditorOptions = { stylingMode: 'filled', placeholder: 'Login', mode: 'text' };
+const passwordEditorOptions = { stylingMode: 'filled', placeholder: 'Password', mode: 'password' };
+const rememberMeEditorOptions = { text: 'Enregistrer le mot de passe', elementAttr: { class: 'form-text' } };
+
+export default function LoginForm() {
   const formData = useRef({
     email: '',
     password: '',
@@ -25,28 +30,43 @@ function LoginForm() {
   const loading = useSelector(state => state.LoginReducer.loading);
   const error = useSelector(state => state.LoginReducer.error);
 
-  // Dans la fonction onSubmit, mise à jour pour gérer les informations utilisateur complètes
   const onSubmit = useCallback(async (e) => {
     e.preventDefault();
-    const { email, password } = formData.current;
-    
-    if(userAuthentification === null){
-      try {
-        const userData = await dispatch(signIn(email, password));
-        // Si rememberMe est coché, on stocke le nom d'utilisateur
-        if (formData.current.rememberMe) {
-          localStorage.setItem('rememberedUser', userData.username);
-        }
-      } catch (error) {
-        // L'erreur est déjà gérée dans le reducer
-      }
+    const { email, password, rememberMe } = formData.current;
+
+    if (!email?.trim() || !password?.trim()) {
+      dispatch({
+        type: LOGIN_FAILURE,
+        payload: 'Tous les champs doivent être remplis'
+      });
+      return;
     }
-  }, [dispatch, userAuthentification]);
+
+    try {
+      console.log(`Tentative de connexion pour l'utilisateur: ${email}`);
+      
+      // Appel à l'action de connexion
+      await dispatch(signIn(email, password));
+      
+      // Mémoriser l'utilisateur si demandé
+      if (rememberMe) {
+        localStorage.setItem('rememberedUser', email);
+      } else {
+        localStorage.removeItem('rememberedUser');
+      }
+      
+      console.log('Connexion réussie, redirection vers le dashboard...');
+      
+      // Redirection vers le dashboard
+      window.location.href = '/dashboard';
+    } catch (err) {
+      console.error('Erreur lors de la connexion:', err);
+    }
+  }, [dispatch]);
 
   return (
     <form className={'login-form'} onSubmit={onSubmit}>
       <img src={logo} alt="Logo" className={'logo'}/>
-      {error && <div className="login-error">{error}</div>}
       <Form formData={formData.current}>
         <Item
           dataField={'email'}
@@ -76,20 +96,18 @@ function LoginForm() {
             width={'100%'}
             type={'default'}
             useSubmitBehavior={true}
-            disabled={loading}
           >
             <span className="dx-button-text">
-              {loading ? <LoadIndicator width={'24px'} height={'24px'} /> : 'Connexion'}
+              {loading ? (
+                <LoadIndicator width="24px" height="24px" visible={true} />
+              ) : (
+                'Connexion'
+              )}
             </span>
           </ButtonOptions>
         </ButtonItem>
+        {error && <div className="login-error">{error}</div>}
       </Form>
     </form>
   );
 }
-
-export default React.memo(LoginForm);
-
-const emailEditorOptions = { stylingMode: 'filled', placeholder: 'Login', mode: 'text' };
-const passwordEditorOptions = { stylingMode: 'filled', placeholder: 'Password', mode: 'password' };
-const rememberMeEditorOptions = { text: 'Enregistrer le mot de passe', elementAttr: { class: 'form-text' } };

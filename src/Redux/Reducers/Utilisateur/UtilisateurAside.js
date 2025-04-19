@@ -13,12 +13,14 @@ import {
 
 const initialState = {
     isOpen: false,
+    isConfirmationOpen: false,
     modeAside: '',
-    allPoste: '',
-    allRole: '',
     selectedUtilisateur: null,
-
-
+    successCallback: null,
+    allPoste: [],
+    allRole: [],
+    messageToShow: '',
+    actionBtnModalConfirmation: null
 };
 
 const UtilisateurAsideReducer = (state = initialState, action) => {
@@ -26,70 +28,76 @@ const UtilisateurAsideReducer = (state = initialState, action) => {
         case SHOW_ASIDE_ADD_MODE_UTILISATEUR:
             return {
                 ...state,
-                modeAside: 'ADD',
                 isOpen: true,
+                modeAside: 'ADD',
                 selectedUtilisateur: null,
                 successCallback: action.payload
             };
-        case SHOW_ASIDE_DELETE_MODE_UTILISATEUR:
-            return {
-                ...state,
-                modeAside: 'DELETE',
-                isOpen: true,
-                selectedUtilisateur: action.payload.selectedUtilisateur,
-                successCallback: action.payload.successCallback
-            };
+
         case SHOW_ASIDE_EDIT_MODE_UTILISATEUR:
             return {
                 ...state,
-                modeAside: 'EDIT',
                 isOpen: true,
+                modeAside: 'EDIT',
                 selectedUtilisateur: action.payload.selectedUtilisateur,
                 successCallback: action.payload.successCallback
             };
+
+        case SHOW_ASIDE_DELETE_MODE_UTILISATEUR:
+            return {
+                ...state,
+                isOpen: true,
+                modeAside: 'DELETE',
+                selectedUtilisateur: action.payload.selectedUtilisateur,
+                successCallback: action.payload.successCallback
+            };
+
+        case SHOW_ASIDE_CONSULT_MODE_UTILISATEUR:
+            return {
+                ...state,
+                isOpen: true,
+                modeAside: 'CONSULT',
+                selectedUtilisateur: action.payload.selectedUtilisateur,
+                successCallback: action.payload.successCallback
+            };
+
         case CLOSE_ASIDE_UTILISATEUR:
             return {
                 ...state,
-                isOpen: false,
-                selectedUtilisateur: null,
+                isOpen: false
             };
+
         case RESET_ASIDE_UTILISATEUR:
-            return {
-                ...state,
-                form: {
-                    codeSaisie: 'test'
-                },
-                selectedUtilisateur: null,
-            };
+            return initialState;
+
         case GET_ALL_POSTE:
             return {
                 ...state,
                 allPoste: action.payload
             };
+
         case GET_ALL_ROLE:
             return {
                 ...state,
                 allRole: action.payload
             };
-        case SHOW_ASIDE_CONSULT_MODE_UTILISATEUR:
-            return {
-                ...state,
-                modeAside: 'CONSULT',
-                isOpen: true,
-                selectedUtilisateur: action.payload
-            };
+
         case SHOW_MODAL_CONFIRMATION_UTILISATEUR:
             return {
                 ...state,
                 isConfirmationOpen: true,
-                messageToShow: action.messageToShow,
-                actionBtnModalConfirmation: action.actionBtnModalConfirmation
+                messageToShow: action.payload.messageToShow,
+                actionBtnModalConfirmation: action.payload.actionBtnModalConfirmation
             };
+
         case CLOSE_MODAL_CONFIRMATION_UTILISATEUR:
             return {
                 ...state,
                 isConfirmationOpen: false,
+                messageToShow: '',
+                actionBtnModalConfirmation: null
             };
+
         default:
             return state;
     }

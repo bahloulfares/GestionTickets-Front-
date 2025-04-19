@@ -67,15 +67,30 @@ export const clearForm = () => {
 
 
 
+// export const handleOpenModalConfirmation = (messageToShow, handleBtnCancelModalConfirmation, handleBtnConfirmerModalConfirmation) => {
+//     return dispatch => {
+//         dispatch({
+//             type: SHOW_MODAL_CONFIRMATION_UTILISATEUR,
+//             messageToShow: messageToShow,
+//             actionBtnModalConfirmation: {handleBtnCancelModalConfirmation, handleBtnConfirmerModalConfirmation}
+//         });
+//     }
+// }
 export const handleOpenModalConfirmation = (messageToShow, handleBtnCancelModalConfirmation, handleBtnConfirmerModalConfirmation) => {
-    return dispatch => {
+    return (dispatch) => {
         dispatch({
             type: SHOW_MODAL_CONFIRMATION_UTILISATEUR,
-            messageToShow: messageToShow,
-            actionBtnModalConfirmation: {handleBtnCancelModalConfirmation, handleBtnConfirmerModalConfirmation}
+            payload: {
+                messageToShow,
+                actionBtnModalConfirmation: {
+                    handleBtnCancelModalConfirmation,
+                    handleBtnConfirmerModalConfirmation
+                }
+            }
         });
-    }
-}
+    };
+};
+
 
 export const handleCloseModalConfirmation = (successCallback) => {
     return dispatch => {

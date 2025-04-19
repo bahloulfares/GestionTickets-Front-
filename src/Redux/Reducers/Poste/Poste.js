@@ -33,22 +33,23 @@ const PostesReducer = (state = initialState, action) => {
         case ADD_NEW_POSTE:
             return {
                 ...state,
-                allPoste: [...state.allPoste, action.payload],
-
+                allPoste: [...state.allPoste, action.payload]
             };
         case EDIT_POSTE:
             return {
                 ...state,
-                allPoste: [...state.allPoste, action.payload]
+                allPoste: state.allPoste.map((poste) =>
+                    poste.idPoste === action.payload.idPoste ? action.payload : poste
+                )
             };
         case DELETE_POSTE:
             return {
                 ...state,
-                allPoste: [...state.allPoste, action.payload]
-            }; 
-
+                allPoste: state.allPoste.filter((poste) => poste.idPoste !== action.payload)
+            };
         default:
             return state;
     }
-}
+};
+
 export default PostesReducer;

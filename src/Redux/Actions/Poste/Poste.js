@@ -3,6 +3,9 @@ import Ressources from '../../../Helper/Ressources';
 import { GET_ALL_POSTE, ADD_NEW_POSTE, DELETE_POSTE, EDIT_POSTE, GET_POSTE_BY_CODE } from "../../Constants/Poste/Poste";
 
 export const getAllPostes = (dataGrid) => {
+    const url = `${Ressources.CoreUrlB}/${Ressources.compteClient.api}/${Ressources.compteClient.postes}`;
+console.log("URL de l'API POSTES :", url);
+
     return dispatch => {
         if (dataGrid && dataGrid.instance) {
             dataGrid.instance.beginCustomLoading();
