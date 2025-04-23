@@ -176,7 +176,7 @@ const ModuleGrid = () => {
             keyExpr='idModule'
             customStore={HelperGrid.constructCustomStore(
                 `${Ressources.CoreUrlB}/${Ressources.compteClient.api}/${Ressources.compteClient.modules}`,
-                'idModule'  // Make sure this matches the keyExpr value
+                'idModule'  
             )}
             onToolbarPreparing={onToolbarPreparing}
             onSelectionChanged={onSelectionChanged}

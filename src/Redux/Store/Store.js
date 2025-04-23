@@ -5,7 +5,8 @@ import enTranslation from "../../i18n/translation_en";
 import arTranslation from "../../i18n/translation_ar";
 
 const cookies = new Cookies();
-let locale =  'fr';
+// Récupérer la langue depuis les cookies ou utiliser 'fr' par défaut
+let locale = cookies.get('lang') || 'fr';
 
 let direction;
 let translation;

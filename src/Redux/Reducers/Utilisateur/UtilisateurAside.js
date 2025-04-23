@@ -13,7 +13,7 @@ import {
 
 const initialState = {
     isOpen: false,
-    isConfirmationOpen: false,
+    isOpenModalConfirmation: false,
     modeAside: '',
     selectedUtilisateur: null,
     successCallback: null,
@@ -57,8 +57,8 @@ const UtilisateurAsideReducer = (state = initialState, action) => {
                 ...state,
                 isOpen: true,
                 modeAside: 'CONSULT',
-                selectedUtilisateur: action.payload.selectedUtilisateur,
-                successCallback: action.payload.successCallback
+                selectedUtilisateur: action.payload,
+                successCallback: null
             };
 
         case CLOSE_ASIDE_UTILISATEUR:
@@ -68,7 +68,9 @@ const UtilisateurAsideReducer = (state = initialState, action) => {
             };
 
         case RESET_ASIDE_UTILISATEUR:
-            return initialState;
+            return {
+                ...initialState
+            };
 
         case GET_ALL_POSTE:
             return {
@@ -85,15 +87,19 @@ const UtilisateurAsideReducer = (state = initialState, action) => {
         case SHOW_MODAL_CONFIRMATION_UTILISATEUR:
             return {
                 ...state,
-                isConfirmationOpen: true,
+                isOpenModalConfirmation: true,
                 messageToShow: action.payload.messageToShow,
-                actionBtnModalConfirmation: action.payload.actionBtnModalConfirmation
+                actionBtnModalConfirmation: {
+                    handleBtnCancelModalConfirmation: action.payload.handleBtnCancelModalConfirmation,
+                    handleBtnConfirmerModalConfirmation: action.payload.handleBtnConfirmerModalConfirmation
+                }
             };
 
+        // In the reducer, make sure this case is properly implemented:
         case CLOSE_MODAL_CONFIRMATION_UTILISATEUR:
             return {
                 ...state,
-                isConfirmationOpen: false,
+                isOpenModalConfirmation: false,
                 messageToShow: '',
                 actionBtnModalConfirmation: null
             };

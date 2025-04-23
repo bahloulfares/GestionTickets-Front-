@@ -1,6 +1,7 @@
 export const Role = {
-    ROLE_ADMIN: "ROLE_ADMIN",
-    ROLE_AUTRE: "ROLE_AUTRE"
+    ROLE_AUTRE: "ROLE_AUTRE",
+    ROLE_ADMIN: "ROLE_ADMIN"
+    
 };
 
 export const RoleOptions = [

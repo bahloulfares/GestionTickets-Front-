@@ -4,14 +4,20 @@ import {
     SHOW_ASIDE_ADD_MODE_POSTE,
     SHOW_ASIDE_DELETE_MODE_POSTE,
     SHOW_ASIDE_EDIT_MODE_POSTE,
-    SHOW_ASIDE_CONSULT_MODE_POSTE
+    SHOW_ASIDE_CONSULT_MODE_POSTE,
+    SHOW_MODAL_CONFIRMATION_POSTE,
+    CLOSE_MODAL_CONFIRMATION_POSTE
 } from "../../Constants/Poste/PosteAside";
 
 const initialState = {
     isOpen: false,
     modeAside: '',
     selectedPoste: null,
-    successCallback: null
+    successCallback: null,
+    // Add these new state properties for the confirmation modal
+    isOpenModalConfirmation: false,
+    messageToShow: '',
+    actionBtnModalConfirmation: null
 };
 
 const PosteAsideReducer = (state = initialState, action) => {
@@ -48,6 +54,25 @@ const PosteAsideReducer = (state = initialState, action) => {
                 selectedPoste: action.payload.selectedPoste,
                 successCallback: action.payload.successCallback
             };
+        case SHOW_MODAL_CONFIRMATION_POSTE:
+            return {
+                ...state,
+                isOpenModalConfirmation: true,
+                messageToShow: action.payload.message,
+                actionBtnModalConfirmation: {
+                    handleBtnCancelModalConfirmation: action.payload.handleBtnCancelModalConfirmation,
+                    handleBtnConfirmerModalConfirmation: action.payload.handleBtnConfirmerModalConfirmation
+                }
+            };
+            
+        case CLOSE_MODAL_CONFIRMATION_POSTE:
+            return {
+                ...state,
+                isOpenModalConfirmation: false,
+                messageToShow: '',
+                actionBtnModalConfirmation: null
+            };
+            
         case CLOSE_ASIDE_POSTE:
             return {
                 ...state,

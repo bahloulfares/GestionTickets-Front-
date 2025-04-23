@@ -4,7 +4,7 @@ import UtilisateurAside from './UtilisateurAside';
 import Impression from "../ComponentTable/Impression";
 import ModalConfirmation from '../ComponentHelper/ModalConfirmation';
 
-class UtilisateurPage extends Component {
+export class UtilisateurPage extends Component {
     render() {
         return (
             <div>

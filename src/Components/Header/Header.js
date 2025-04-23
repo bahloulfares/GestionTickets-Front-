@@ -4,6 +4,8 @@ import { connect } from "react-redux";
 import { getDateServeur } from "../../Redux/Actions/Header/Header";
 import { logOut } from '../../Redux/Actions/Login/Login';
 import { useSelector, useDispatch } from 'react-redux';
+import Cookies from "universal-cookie";
+import LanguageSelector from '../LanguageSelector/LanguageSelector';
 
 /**
  * Contains brand, application name, breadcrumbs, username and logout button
@@ -25,6 +27,13 @@ export class Header extends Component {
                 || el.mozRequestFullScreen
             ;
         rfs.call(el);
+    }
+    
+    // Ajout d'une fonction pour changer la langue
+    changeLanguage = (lang) => {
+        const cookies = new Cookies();
+        cookies.set('lang', lang, { path: '/' });
+        window.location.reload();
     }
 
     render() {
@@ -51,16 +60,20 @@ export class Header extends Component {
                         {/* <div className="global_breadcrumbs">{breadcrumbs}</div> */}
                     </div>
                     <div className="pull-right">
+                        {/* Remplacer le sélecteur de langue par notre composant */}
+                        <div className="btn-header transparent pull-right">
+                            <LanguageSelector mode="header" />
+                        </div>
                         <div id="logout" className="btn-header transparent pull-right">
                             <span>
-                                <a data-action="logout" id="globaldeconnexion" onClick={logOut()}>
+                                <a data-action="logout" id="globaldeconnexion" onClick={logOut()} title={this.props.intl.messages.logout || "Déconnexion"}>
                                     <i className="fas fa-power-off" />
                                 </a>
                             </span>
                         </div>
                         <div id="fullscreen" className="btn-header transparent pull-right">
                             <span>
-                                <a href="#" id="launchFullscreen" data-action="launchFullscreen" title="Plein écran"
+                                <a href="#" id="launchFullscreen" data-action="launchFullscreen" title={this.props.intl.messages.fullscreen || "Plein écran"}
                                     onClick={this.launchFullscreen}>
                                     <i className="fas fa-arrows-alt" />
                                 </a>
@@ -70,7 +83,7 @@ export class Header extends Component {
                         </div>
                         <div id="acceuil" className="btn-header transparent pull-right" style={{ color: 'white' }}>
                             <span> <a data-action="acceuil" id="globalAcceuil" title={this.props.intl.messages.home}
-                                href="../CliniSys/menu"><i
+                                href="/dashboard"><i
                                     className="fas fa-home" /></a> </span>
                         </div>
                         <div id="userAffiche" className="btn-header transparent pull-right">

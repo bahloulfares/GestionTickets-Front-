@@ -55,16 +55,31 @@ export const checkAuthentication = () => async (dispatch) => {
 };
 
 // Add this export for the logout function
-export const logOut = () => (dispatch) => {
-  // Clear user data from localStorage
-  localStorage.removeItem('authToken');
-  localStorage.removeItem('userData');
-  localStorage.removeItem('isAuthenticated');
-  localStorage.removeItem('rememberedUser');
+// Modified logout function to handle both direct calls and dispatch
+export const logOut = () => {
+  // Function to perform the actual logout operations
+  const performLogout = () => {
+    // Clear user data from localStorage
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('userData');
+    localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem('rememberedUser');
+    
+    // Redirect to login page
+    window.location.href = '/';
+    
+    // Return the action for Redux
+    return { type: LOGOUT };
+  };
   
-  // Dispatch logout action to Redux
-  dispatch({ type: LOGOUT });
-  
-  // Redirect to login page
-  window.location.href = '/';
+  // Check if this is being called with dispatch or directly
+  return (dispatch) => {
+    if (typeof dispatch === 'function') {
+      // Normal Redux thunk flow
+      dispatch(performLogout());
+    } else {
+      // Direct call without dispatch
+      performLogout();
+    }
+  };
 };

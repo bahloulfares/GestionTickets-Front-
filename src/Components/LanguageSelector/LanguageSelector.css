@@ -1,0 +1,13 @@
+.language-selector.login-mode {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.login-form .lang-btn {
+  color: #333;
+  border-color: #ccc;
+  padding: 3px 8px;
+  font-size: 12px;
+  margin: 0 3px;
+}

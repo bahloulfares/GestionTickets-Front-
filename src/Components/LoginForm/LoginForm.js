@@ -12,11 +12,9 @@ import { LOGIN_FAILURE } from '../../Redux/Constants/Login/Login';
 import './login-form.css';
 import { useSelector, useDispatch } from 'react-redux';
 import logo from '../../assests/css/images/logo_csys.png';
-
-// Configuration des éditeurs
-const emailEditorOptions = { stylingMode: 'filled', placeholder: 'Login', mode: 'text' };
-const passwordEditorOptions = { stylingMode: 'filled', placeholder: 'Password', mode: 'password' };
-const rememberMeEditorOptions = { text: 'Enregistrer le mot de passe', elementAttr: { class: 'form-text' } };
+import LanguageSelector from '../LanguageSelector/LanguageSelector';
+// Suppression de l'import inutilisé
+// import { Center } from 'devextreme-react/map';
 
 export default function LoginForm() {
   const formData = useRef({
@@ -29,6 +27,26 @@ export default function LoginForm() {
   const userAuthentification = useSelector(state => state.LoginReducer.userAuthentification);
   const loading = useSelector(state => state.LoginReducer.loading);
   const error = useSelector(state => state.LoginReducer.error);
+  // Ajout du sélecteur pour obtenir les messages de traduction
+  const intl = useSelector(state => state.intl || { messages: {} });
+
+  // Configuration des éditeurs avec traductions
+  const localizedEmailOptions = { 
+    stylingMode: 'filled', 
+    placeholder: intl.messages?.login || 'Login', 
+    mode: 'text' 
+  };
+  
+  const localizedPasswordOptions = { 
+    stylingMode: 'filled', 
+    placeholder: intl.messages?.password || 'Password', 
+    mode: 'password' 
+  };
+  
+  const localizedRememberMeOptions = { 
+    text: intl.messages?.rememberMe || 'Enregistrer le mot de passe', 
+    elementAttr: { class: 'form-text' } 
+  };
 
   const onSubmit = useCallback(async (e) => {
     e.preventDefault();
@@ -65,29 +83,36 @@ export default function LoginForm() {
   }, [dispatch]);
 
   return (
+   
     <form className={'login-form'} onSubmit={onSubmit}>
       <img src={logo} alt="Logo" className={'logo'}/>
+
       <Form formData={formData.current}>
+        <Item>
+          <div className="language-selector login-mode right-align">
+            <LanguageSelector mode="login" />
+          </div>
+        </Item>
         <Item
           dataField={'email'}
           editorType={'dxTextBox'}
-          editorOptions={emailEditorOptions}
+          editorOptions={localizedEmailOptions}
         >
-          <RequiredRule message="Login is required" />
+          <RequiredRule message={intl.messages?.validationRequired || "Login is required"} />
           <Label visible={false} />
         </Item>
         <Item
           dataField={'password'}
           editorType={'dxTextBox'}
-          editorOptions={passwordEditorOptions}
+          editorOptions={localizedPasswordOptions}
         >
-          <RequiredRule message="Password is required" />
+          <RequiredRule message={intl.messages?.passwordRequired || "Password is required"} />
           <Label visible={false} />
         </Item>
         <Item
           dataField={'rememberMe'}
           editorType={'dxCheckBox'}
-          editorOptions={rememberMeEditorOptions}
+          editorOptions={localizedRememberMeOptions}
         >
           <Label visible={false} />
         </Item>
@@ -101,7 +126,7 @@ export default function LoginForm() {
               {loading ? (
                 <LoadIndicator width="24px" height="24px" visible={true} />
               ) : (
-                'Connexion'
+                intl.messages?.submit || 'Connexion'
               )}
             </span>
           </ButtonOptions>

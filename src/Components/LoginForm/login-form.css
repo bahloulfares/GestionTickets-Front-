@@ -33,3 +33,31 @@
   text-align: center;
 }
 
+.login-container {
+  position: relative;
+  /* Ajoutez ce style pour le conteneur du sélecteur de langue */
+  .language-selector-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 15px;
+  }
+  
+  /* Assurez-vous que le logo a une marge en bas */
+  .logo {
+    margin-bottom: 10px;
+  }
+}
+
+/* Alignement à droite dans le formulaire */
+.language-selector.login-mode.right-align {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
+.login-form .lang-btn {
+  padding: 2px 6px;
+  font-size: 11px;
+  border-radius: 4px;
+}
+

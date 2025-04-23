@@ -145,8 +145,8 @@ const ModuleAside = () => {
                 });
         } else if (modeAside === 'EDIT') {
             // Use the confirmation modal for edit
-            const handleBtnConfirmerModalConfirmation = () => {
-                dispatch(handleCloseModalConfirmation());
+            //const handleBtnConfirmerModalConfirmation = () => {
+                // dispatch(handleCloseModalConfirmation());
                 dispatch(editModule(moduleData))
                     .then(() => {
                         notify(messages.editSuccess || "Module updated successfully", "success", notifyOptions);
@@ -157,17 +157,17 @@ const ModuleAside = () => {
                         notify(messages.editFailed || "Failed to update module", "error", notifyOptions);
                         console.error("Edit module error:", error);
                     });
-            };
+            //};
             
-            const handleBtnCancelModalConfirmation = () => {
-                dispatch(handleCloseModalConfirmation());
-            };
+            // const handleBtnCancelModalConfirmation = () => {
+            //     dispatch(handleCloseModalConfirmation());
+            // };
             
-            dispatch(handleOpenModalConfirmation(
-                messages.confirmEdit || "Are you sure you want to update this module?",
-                handleBtnCancelModalConfirmation,
-                handleBtnConfirmerModalConfirmation
-            ));
+            // dispatch(handleOpenModalConfirmation(
+            //     messages.confirmEdit || "Are you sure you want to update this module?",
+            //     handleBtnCancelModalConfirmation,
+            //     handleBtnConfirmerModalConfirmation
+            // ));
         } else if (modeAside === 'DELETE') {
             // Use the confirmation modal for delete
             const handleBtnConfirmerModalConfirmation = () => {

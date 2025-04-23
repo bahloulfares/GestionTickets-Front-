@@ -4,7 +4,9 @@ import {
     SHOW_ASIDE_ADD_MODE_POSTE,
     SHOW_ASIDE_EDIT_MODE_POSTE,
     SHOW_ASIDE_DELETE_MODE_POSTE,
-    SHOW_ASIDE_CONSULT_MODE_POSTE
+    SHOW_ASIDE_CONSULT_MODE_POSTE,
+    SHOW_MODAL_CONFIRMATION_POSTE,
+    CLOSE_MODAL_CONFIRMATION_POSTE
 } from "../../Constants/Poste/PosteAside";
 
 export const handleOpenAddMode = (successCallback) => {
@@ -55,6 +57,28 @@ export const handleReset = () => {
     return dispatch => {
         dispatch({
             type: RESET_ASIDE_POSTE
+        });
+    }
+}
+
+// Add the missing modal confirmation functions
+export const handleOpenModalConfirmation = (message, handleBtnCancelModalConfirmation, handleBtnConfirmerModalConfirmation) => {
+    return dispatch => {
+        dispatch({
+            type: SHOW_MODAL_CONFIRMATION_POSTE,
+            payload: {
+                message,
+                handleBtnCancelModalConfirmation,
+                handleBtnConfirmerModalConfirmation
+            }
+        });
+    }
+}
+
+export const handleCloseModalConfirmation = () => {
+    return dispatch => {
+        dispatch({
+            type: CLOSE_MODAL_CONFIRMATION_POSTE
         });
     }
 }

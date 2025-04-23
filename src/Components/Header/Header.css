@@ -104,3 +104,30 @@ h1 small{
 .nameModule h1 {
     font-size: 1.5rem;
 }
+
+
+/* Styles pour le sélecteur de langue */
+.language-selector {
+    display: flex;
+    margin-top: 8px;
+}
+
+.lang-btn {
+    background: transparent;
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    margin: 0 2px;
+    padding: 2px 5px;
+    font-size: 12px;
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+.lang-btn.active {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: white;
+}
+
+.lang-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}

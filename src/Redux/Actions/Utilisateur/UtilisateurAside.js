@@ -57,7 +57,7 @@ export const handleClose = () => {
     }
 }
 
-export const clearForm = () => {
+export const handleReset = () => {
     return dispatch => {
         dispatch({
             type: RESET_ASIDE_UTILISATEUR
@@ -65,62 +65,67 @@ export const clearForm = () => {
     }
 }
 
+export const getAllPostes = () => {
+    return dispatch => {
+        return axios.get(`${Ressources.CoreUrlB}/${Ressources.compteClient.api}/${Ressources.compteClient.postes}`)
+            .then(res => {
+                dispatch({
+                    type: GET_ALL_POSTE,
+                    payload: res.data
+                });
+                return res.data;
+            })
+            .catch(error => {
+                console.error("Erreur lors de la récupération des postes:", error);
+                throw error;
+            });
+    }
+}
 
+export const getAllRoles = () => {
+    return dispatch => {
+        return axios.get(`${Ressources.CoreUrlB}/${Ressources.compteClient.api}/roles`)
+            .then(res => {
+                dispatch({
+                    type: GET_ALL_ROLE,
+                    payload: res.data
+                });
+                return res.data;
+            })
+            .catch(error => {
+                console.error("Erreur lors de la récupération des rôles:", error);
+                throw error;
+            });
+    }
+}
 
-// export const handleOpenModalConfirmation = (messageToShow, handleBtnCancelModalConfirmation, handleBtnConfirmerModalConfirmation) => {
-//     return dispatch => {
-//         dispatch({
-//             type: SHOW_MODAL_CONFIRMATION_UTILISATEUR,
-//             messageToShow: messageToShow,
-//             actionBtnModalConfirmation: {handleBtnCancelModalConfirmation, handleBtnConfirmerModalConfirmation}
-//         });
-//     }
-// }
 export const handleOpenModalConfirmation = (messageToShow, handleBtnCancelModalConfirmation, handleBtnConfirmerModalConfirmation) => {
-    return (dispatch) => {
+    return dispatch => {
+        // Assurons-nous que les callbacks sont des fonctions valides
+        const cancelCallback = typeof handleBtnCancelModalConfirmation === 'function' 
+            ? handleBtnCancelModalConfirmation 
+            : () => dispatch(handleCloseModalConfirmation());
+            
+        const confirmCallback = typeof handleBtnConfirmerModalConfirmation === 'function'
+            ? handleBtnConfirmerModalConfirmation
+            : () => dispatch(handleCloseModalConfirmation());
+            
         dispatch({
             type: SHOW_MODAL_CONFIRMATION_UTILISATEUR,
             payload: {
                 messageToShow,
-                actionBtnModalConfirmation: {
-                    handleBtnCancelModalConfirmation,
-                    handleBtnConfirmerModalConfirmation
-                }
+                handleBtnCancelModalConfirmation: cancelCallback,
+                handleBtnConfirmerModalConfirmation: confirmCallback
             }
         });
-    };
-};
+    }
+}
 
-
-export const handleCloseModalConfirmation = (successCallback) => {
+export const handleCloseModalConfirmation = () => {
     return dispatch => {
         dispatch({
-            type: CLOSE_MODAL_CONFIRMATION_UTILISATEUR,
-            payload: successCallback
+            type: CLOSE_MODAL_CONFIRMATION_UTILISATEUR
         });
-    }
-}
-export const getAllPoste = () => {
-    return dispatch => {
-        axios.get(`${Ressources.CoreUrlB}/${Ressources.compteClient.api}/${Ressources.compteClient.postes}`).then(res => {
-            dispatch({
-                type: GET_ALL_POSTE,
-                payload: res.data
-            })
-        })
-    }
-}
-
-
-
-export const getAllRole = () => {
-    return dispatch => {
-        axios.get(`${Ressources.CoreUrlB}/${Ressources.compteClient.api}/${Ressources.compteClient.utilisateurs}/roles`).then(res => {
-            dispatch({
-                type: GET_ALL_ROLE,
-                payload: res.data
-            })
-        })
     }
 }
 

@@ -39,6 +39,21 @@ export default {
   "Au": "إلى",
   "mail":"البريد الالكتروني",
     "CodeClient":" معرف العميل",
-    "login":"تسجيل الدخول",
-    "MotDePasse":"كلمة المرور"
+    "login": "اسم المستخدم",
+    "MotDePasse": "كلمة المرور",
+    "password": "كلمة المرور",
+    "rememberMe": "تذكرني",
+    "submit": "تسجيل الدخول",
+    // Ajoutez ces messages d'erreur
+    "authenticationError": "خطأ في المصادقة",
+    "sessionExpired": "انتهت صلاحية جلستك",
+    "invalidCredentials": "بيانات الاعتماد غير صالحة",
+    "passwordMismatch": "كلمات المرور غير متطابقة",
+    "serverError": "خطأ في الخادم",
+    "networkError": "خطأ في الشبكة",
+    "connectionError": "خطأ في الاتصال",
+    "timeoutError": "انتهت مهلة الاتصال",
+    "noServerResponse": "لا استجابة من الخادم",
+    "requestError": "خطأ في الطلب",
+    "notificationError": "حدث خطأ",
 };

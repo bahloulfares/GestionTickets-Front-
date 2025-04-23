@@ -1,385 +1,549 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Modal, ModalHeader, ModalBody, ModalFooter, Form, FormGroup, Label, Input } from 'reactstrap';
-import { handleClose, handleOpenModalConfirmation, handleCloseModalConfirmation } from "../../Redux/Actions/Utilisateur/UtilisateurAside";
-import { addNewUtilisateur, editUtilisateur, deleteUtilisateur } from "../../Redux/Actions/Utilisateur/Utilisateur";
+import {
+  Button,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Form,
+  FormGroup,
+  Label,
+  Input,
+} from "reactstrap";
+import {
+  handleClose,
+  handleOpenModalConfirmation,
+  handleCloseModalConfirmation,
+} from "../../Redux/Actions/Utilisateur/UtilisateurAside";
+import {
+  addNewUtilisateur,
+  editUtilisateur,
+  deleteUtilisateur,
+} from "../../Redux/Actions/Utilisateur/Utilisateur";
 import { getAllPostes } from "../../Redux/Actions/Poste/Poste";
 import notify from "devextreme/ui/notify";
-import { notifyOptions } from '../../Helper/Config';
-import { Role, RoleOptions } from '../../Helper/Enums/Role';
-import { SelectBox } from 'devextreme-react/select-box';
-import '../../assests/css/modals.css';
+import { notifyOptions } from "../../Helper/Config";
+import { Role, RoleOptions } from "../../Helper/Enums/Role";
+import { SelectBox } from "devextreme-react/select-box";
+import "../../assests/css/modals.css";
 
 const UtilisateurAside = () => {
-    const dispatch = useDispatch();
-    const {
-        isOpen,
-        modeAside,
-        selectedUtilisateur,
-        successCallback
-    } = useSelector(state => state.UtilisateurAsideReducer);
+  const dispatch = useDispatch();
+  const {
+    isOpen,
+    modeAside,
+    selectedUtilisateur,
+    successCallback,
+    isOpenModalConfirmation,
+    messageToShow,
+    actionBtnModalConfirmation,
+  } = useSelector((state) => state.UtilisateurAsideReducer);
 
-    const allPoste = useSelector(state => state.UtilisateurAsideReducer.allPoste);
-    const { isOpenModalConfirmation } = useSelector(state => state.UtilisateurAsideReducer);
-    const messages = useSelector(state => state.intl.messages);
-    const direction = useSelector(state => state.intl.direction);
+  const allPoste = useSelector(
+    (state) => state.UtilisateurAsideReducer.allPoste
+  );
+  const messages = useSelector((state) => state.intl.messages);
+  const direction = useSelector((state) => state.intl.direction);
 
-    const [formData, setFormData] = useState({
-        username: '',
-        password: '',
-        nom: '',
-        prenom: '',
-        description: '',
-        role: Role.AUTRE,
+  const [formData, setFormData] = useState({
+    username: "",
+    password: "",
+    nom: "",
+    prenom: "",
+    description: "",
+    role: Role.ROLE_AUTRE, // Utiliser ROLE_AUTRE comme valeur par défaut
+    poste: null,
+    actif: true,
+  });
+
+  useEffect(() => {
+    dispatch(getAllPostes());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (selectedUtilisateur) {
+      // Récupération du poste
+      let posteData = null;
+      if (selectedUtilisateur.poste) {
+        // Si le poste est déjà un objet complet
+        if (
+          typeof selectedUtilisateur.poste === "object" &&
+          selectedUtilisateur.poste.idPoste
+        ) {
+          posteData = selectedUtilisateur.poste;
+        }
+        // Si le poste est un objet avec seulement un id
+        else if (
+          typeof selectedUtilisateur.poste === "object" &&
+          selectedUtilisateur.poste.id
+        ) {
+          const posteId = selectedUtilisateur.poste.id;
+          if (allPoste && allPoste.length > 0) {
+            const foundPoste = allPoste.find((p) => p.idPoste === posteId);
+            if (foundPoste) {
+              posteData = foundPoste;
+            }
+          }
+        }
+        // Si le poste est directement un ID (nombre ou chaîne)
+        else if (
+          typeof selectedUtilisateur.poste === "number" ||
+          (typeof selectedUtilisateur.poste === "string" &&
+            !isNaN(parseInt(selectedUtilisateur.poste)))
+        ) {
+          const posteId =
+            typeof selectedUtilisateur.poste === "number"
+              ? selectedUtilisateur.poste
+              : parseInt(selectedUtilisateur.poste);
+
+          if (allPoste && allPoste.length > 0) {
+            const foundPoste = allPoste.find((p) => p.idPoste === posteId);
+            if (foundPoste) {
+              posteData = foundPoste;
+            }
+          }
+        }
+      } else if (selectedUtilisateur.idPoste) {
+        // Cas où le poste est stocké directement comme idPoste dans l'utilisateur
+        if (allPoste && allPoste.length > 0) {
+          const foundPoste = allPoste.find((p) => p.idPoste === selectedUtilisateur.idPoste);
+          if (foundPoste) {
+            posteData = foundPoste;
+          }
+        }
+      }
+
+      console.log("Poste récupéré:", posteData); // Pour déboguer
+
+      setFormData({
+        username: selectedUtilisateur.username || "",
+        password: "", // Ne pas afficher le mot de passe existant
+        nom: selectedUtilisateur.nom || "",
+        prenom: selectedUtilisateur.prenom || "",
+        description: selectedUtilisateur.description || "",
+        role: selectedUtilisateur.role || Role.ROLE_AUTRE,
+        poste: posteData,
+        actif: selectedUtilisateur.actif !== false,
+      });
+    } else {
+      setFormData({
+        username: "",
+        password: "",
+        nom: "",
+        prenom: "",
+        description: "",
+        role: Role.ROLE_AUTRE,
         poste: null,
-        actif: true
+        actif: true,
+      });
+    }
+  }, [selectedUtilisateur, allPoste]);
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const handlePosteChange = (value) => {
+    const selectedPoste = allPoste.find((p) => p.idPoste === value);
+    setFormData((prev) => ({
+      ...prev,
+      poste: selectedPoste || null,
+    }));
+  };
+
+  const onClickBtnClose = () => {
+    dispatch(handleClose());
+  };
+
+  const getTitle = () => {
+    switch (modeAside) {
+      case "ADD":
+        return messages.addUser || "Ajouter un utilisateur";
+      case "EDIT":
+        return messages.editUser || "Modifier un utilisateur";
+      case "DELETE":
+        return messages.deleteUser || "Supprimer un utilisateur";
+      case "CONSULT":
+        return messages.consultUser || "Consulter un utilisateur";
+      default:
+        return messages.user || "Utilisateur";
+    }
+  };
+
+  const renderFooterButtons = () => {
+    switch (modeAside) {
+      case "ADD":
+        return (
+          <>
+            <Button color="secondary" onClick={onClickBtnClose}>
+              {messages.cancel || "Annuler"}
+            </Button>
+            <Button color="primary" onClick={handleSubmit}>
+              {messages.add || "Ajouter"}
+            </Button>
+          </>
+        );
+      case "EDIT":
+        return (
+          <>
+            <Button color="secondary" onClick={onClickBtnClose}>
+              {messages.cancel || "Annuler"}
+            </Button>
+            <Button color="primary" onClick={handleSubmit}>
+              {messages.save || "Enregistrer"}
+            </Button>
+          </>
+        );
+      case "DELETE":
+        return (
+          <>
+            <Button color="secondary" onClick={onClickBtnClose}>
+              {messages.cancel || "Annuler"}
+            </Button>
+            <Button color="danger" onClick={handleSubmit}>
+              {messages.delete || "Supprimer"}
+            </Button>
+          </>
+        );
+      case "CONSULT":
+        return (
+          <Button color="secondary" onClick={onClickBtnClose}>
+            {messages.close || "Fermer"}
+          </Button>
+        );
+      default:
+        return null;
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    // Validation des champs obligatoires
+    if (!formData.username || !formData.nom || !formData.prenom) {
+      notify(
+        "Veuillez remplir tous les champs obligatoires",
+        "error",
+        notifyOptions
+      );
+      return;
+    }
+
+    // En mode ajout, vérifier que le mot de passe est fourni
+    if (modeAside === "ADD" && !formData.password) {
+      notify(
+        "Le mot de passe est obligatoire pour un nouvel utilisateur",
+        "error",
+        notifyOptions
+      );
+      return;
+    }
+
+    // Make sure poste is properly formatted for the API
+    const posteData = formData.poste
+      ? {
+          idPoste: formData.poste.idPoste,
+          designation: formData.poste.designation,
+        }
+      : null;
+
+    const userData = {
+      username: formData.username,
+      ...(formData.password && { password: formData.password }),
+      nom: formData.nom,
+      prenom: formData.prenom,
+      description: formData.description,
+      role: formData.role || Role.ROLE_AUTRE, // Utilisez ROLE_AUTRE si aucun rôle n'est sélectionné
+      poste: posteData,
+      actif: formData.actif,
+    };
+
+    // Afficher un indicateur de chargement
+    const loadingMessage = notify("Traitement en cours...", "info", {
+      ...notifyOptions,
+      displayTime: 0, // Reste affiché jusqu'à ce qu'on le ferme
     });
-console.log("formData", formData);
-    useEffect(() => {
-        dispatch(getAllPostes());
-    }, [dispatch]);
 
-    useEffect(() => {
-        if (selectedUtilisateur) {
-            setFormData({
-                username: selectedUtilisateur.username || '',
-                password: '', // Ne pas afficher le mot de passe existant
-                nom: selectedUtilisateur.nom || '',
-                prenom: selectedUtilisateur.prenom || '',
-                description: selectedUtilisateur.description || '',
-                role: selectedUtilisateur.role || Role.AUTRE,
-                poste: selectedUtilisateur.poste || null,
-                actif: selectedUtilisateur.actif !== false
-            });
-        } else {
-            setFormData({
-                username: '',
-                password: '',
-                nom: '',
-                prenom: '',
-                description: '',
-                role: Role.AUTRE,
-                poste: null,
-                actif: true
-            });
-        }
-    }, [selectedUtilisateur]);
-
-    const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: type === 'checkbox' ? checked : value
-        }));
-    };
-
-    const handlePosteChange = (value) => {
-        const selectedPoste = allPoste.find(p => p.idPoste === value);
-        setFormData(prev => ({
-            ...prev,
-            poste: selectedPoste || null
-        }));
-    };
-
-    const onClickBtnClose = () => {
-        dispatch(handleClose());
-    };
-
-    const getTitle = () => {
-        switch (modeAside) {
-            case 'ADD': return messages.addUser || "Ajouter un utilisateur";
-            case 'EDIT': return messages.editUser || "Modifier un utilisateur";
-            case 'DELETE': return messages.deleteUser || "Supprimer un utilisateur";
-            case 'CONSULT': return messages.consultUser || "Consulter un utilisateur";
-            default: return messages.user || "Utilisateur";
-        }
-    };
-
-    const renderFooterButtons = () => {
-        switch (modeAside) {
-            case 'ADD':
-                return (
-                    <>
-                        <Button color="secondary" onClick={onClickBtnClose}>
-                            {messages.cancel || "Annuler"}
-                        </Button>
-                        <Button color="primary" onClick={handleSubmit}>
-                            {messages.add || "Ajouter"}
-                        </Button>
-                    </>
-                );
-            case 'EDIT':
-                return (
-                    <>
-                        <Button color="secondary" onClick={onClickBtnClose}>
-                            {messages.cancel || "Annuler"}
-                        </Button>
-                        <Button color="primary" onClick={handleSubmit}>
-                            {messages.save || "Enregistrer"}
-                        </Button>
-                    </>
-                );
-            case 'DELETE':
-                return (
-                    <>
-                        <Button color="secondary" onClick={onClickBtnClose}>
-                            {messages.cancel || "Annuler"}
-                        </Button>
-                        <Button color="danger" onClick={handleSubmit}>
-                            {messages.delete || "Supprimer"}
-                        </Button>
-                    </>
-                );
-            case 'CONSULT':
-                return (
-                    <Button color="secondary" onClick={onClickBtnClose}>
-                        {messages.close || "Fermer"}
-                    </Button>
-                );
-            default: return null;
-        }
-    };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-
-        if (!formData.username) {
-            notify(messages.usernameRequired || "Le nom d'utilisateur est requis", "error", notifyOptions);
-            return;
-        }
-
-        if (modeAside === 'ADD' && !formData.password) {
-            notify(messages.passwordRequired || "Le mot de passe est requis", "error", notifyOptions);
-            return;
-        }
-
-        if (!formData.role) {
-            notify(messages.roleRequired || "Le rôle est requis", "error", notifyOptions);
-            return;
-        }
-
-        const userData = {
-            username: formData.username,
-            ...(formData.password && { password: formData.password }),
-            nom: formData.nom,
-            prenom: formData.prenom,
-            description: formData.description,
-            role: formData.role,
-            ...(formData.poste && { poste: formData.poste }),
-            actif: formData.actif
-        };
-
-        if (modeAside === 'ADD') {
-            dispatch(addNewUtilisateur(userData))
-                .then(() => {
-                    notify(messages.addSuccess || "Utilisateur ajouté avec succès", "success", notifyOptions);
+    if (modeAside === "ADD") {
+      dispatch(addNewUtilisateur(userData))
+        .then(() => {
+          loadingMessage.close();
+          notify(
+            messages.addSuccess || "Utilisateur ajouté avec succès",
+            "success",
+            notifyOptions
+          );
+          dispatch(handleClose());
+          if (successCallback) successCallback();
+        })
+        .catch((error) => {
+          loadingMessage.close();
+          notify(
+            messages.addFailed || "Échec de l'ajout",
+            "error",
+            notifyOptions
+          );
+          console.error("Erreur ajout utilisateur:", error);
+        });
+    } else if (modeAside === "EDIT") {
+      dispatch(editUtilisateur(userData))
+        .then(() => {
+          loadingMessage.close();
+          notify(
+            messages.editSuccess || "Utilisateur modifié avec succès",
+            "success",
+            notifyOptions
+          );
+          dispatch(handleClose());
+          if (successCallback) successCallback();
+        })
+        .catch((error) => {
+          loadingMessage.close();
+          notify(
+            messages.editFailed || "Échec de la modification",
+            "error",
+            notifyOptions
+          );
+          console.error("Erreur modification utilisateur:", error);
+        });
+      } else if (modeAside === 'DELETE') {
+        // Use the confirmation modal for delete
+        const handleBtnConfirmerModalConfirmation = () => {
+            dispatch(handleCloseModalConfirmation());
+            dispatch(deleteUtilisateur(userData.username))                .then(() => {
+                    notify(messages.deleteSuccess || "Module deleted successfully", "success", notifyOptions);
                     dispatch(handleClose());
                     if (successCallback) successCallback();
                 })
-                .catch(error => {
-                    notify(messages.addFailed || "Échec de l'ajout de l'utilisateur", "error", notifyOptions);
-                    console.error("Erreur ajout utilisateur:", error);
+                .catch((error) => {
+                    notify(messages.deleteFailed || "Failed to delete module", "error", notifyOptions);
+                    console.error("Delete module error:", error);
                 });
-        } else if (modeAside === 'EDIT') {
-            const handleConfirm = () => {
-                dispatch(handleCloseModalConfirmation());
-                dispatch(editUtilisateur(userData))
-                    .then(() => {
-                        notify(messages.editSuccess || "Utilisateur modifié avec succès", "success", notifyOptions);
-                        dispatch(handleClose());
-                        if (successCallback) successCallback();
-                    })
-                    .catch(error => {
-                        notify(messages.editFailed || "Échec de la modification", "error", notifyOptions);
-                        console.error("Erreur modification utilisateur:", error);
-                    });
-            };
+        };
+        
+        const handleBtnCancelModalConfirmation = () => {
+            dispatch(handleCloseModalConfirmation());
+        };
+        
+        dispatch(handleOpenModalConfirmation(
+            messages.confirmDelete || "Are you sure you want to delete this module?",
+            handleBtnCancelModalConfirmation,
+            handleBtnConfirmerModalConfirmation
+        ));
+    }
+  };
 
-            const handleCancel = () => {
-                dispatch(handleCloseModalConfirmation());
-            };
+  const handleConfirmAction = () => {
+    if (
+      actionBtnModalConfirmation &&
+      typeof actionBtnModalConfirmation.handleBtnConfirmerModalConfirmation ===
+        "function"
+    ) {
+      // Execute the confirmation callback
+      actionBtnModalConfirmation.handleBtnConfirmerModalConfirmation();
+    } else {
+      // If no callback, simply close the modal
+      dispatch(handleCloseModalConfirmation());
+    }
+  };
+  return (
+    <>
+      <Modal
+        isOpen={isOpen}
+        toggle={onClickBtnClose}
+        className="utilisateur-modal"
+        style={{ direction: direction }}
+        size="lg"
+      >
+        <ModalHeader toggle={onClickBtnClose}>{getTitle()}</ModalHeader>
+        <ModalBody>
+        <Form onSubmit={handleSubmit}>
+  <div className="row">
+    <div className="col-6">
+      <FormGroup>
+        <Label for="username">{messages.username || "Nom d'utilisateur"} *</Label>
+        <Input
+          type="text"
+          name="username"
+          id="username"
+          value={formData.username}
+          onChange={handleChange}
+          disabled={modeAside === "EDIT" || modeAside === "CONSULT" || modeAside === "DELETE"}
+          required
+        />
+      </FormGroup>
+    </div>
+    <div className="col-6">
+      <FormGroup>
+        <Label for="password">{messages.password || "Mot de passe"} {modeAside === "ADD" && " *"}</Label>
+        <Input
+          type="password"
+          name="password"
+          id="password"
+          value={formData.password}
+          onChange={handleChange}
+          required={modeAside === "ADD"}
+          placeholder={modeAside === "EDIT" ? messages.leaveEmptyToKeep || "nouveaux mot de passe" : ""}
+          disabled={modeAside === "CONSULT" || modeAside === "DELETE"}
+        />
+      </FormGroup>
+    </div>
+  </div>
 
-            dispatch(handleOpenModalConfirmation(
-                messages.confirmEdit || "Confirmez-vous la modification de cet utilisateur ?",
-                handleCancel,
-                handleConfirm
-            ));
-        } else if (modeAside === 'DELETE') {
-            const handleConfirm = () => {
-                dispatch(handleCloseModalConfirmation());
-                dispatch(deleteUtilisateur(formData.username))
-                    .then(() => {
-                        notify(messages.deleteSuccess || "Utilisateur supprimé avec succès", "success", notifyOptions);
-                        dispatch(handleClose());
-                        if (successCallback) successCallback();
-                    })
-                    .catch(error => {
-                        notify(messages.deleteFailed || "Échec de la suppression", "error", notifyOptions);
-                        console.error("Erreur suppression utilisateur:", error);
-                    });
-            };
+  <div className="row">
+    <div className="col-6">
+      <FormGroup>
+        <Label for="nom">{messages.nom || "Nom"} *</Label>
+        <Input
+          type="text"
+          name="nom"
+          id="nom"
+          value={formData.nom}
+          onChange={handleChange}
+          disabled={modeAside === "CONSULT" || modeAside === "DELETE"}
+          required
+        />
+      </FormGroup>
+    </div>
+    <div className="col-6">
+      <FormGroup>
+        <Label for="prenom">{messages.prenom || "Prénom"} *</Label>
+        <Input
+          type="text"
+          name="prenom"
+          id="prenom"
+          value={formData.prenom}
+          onChange={handleChange}
+          disabled={modeAside === "CONSULT" || modeAside === "DELETE"}
+          required
+        />
+      </FormGroup>
+    </div>
+  </div>
 
-            const handleCancel = () => {
-                dispatch(handleCloseModalConfirmation());
-            };
-
-            dispatch(handleOpenModalConfirmation(
-                messages.confirmDelete || "Confirmez-vous la suppression de cet utilisateur ?",
-                handleCancel,
-                handleConfirm
-            ));
-        }
-    };
-
-    return (
-        <Modal 
-            isOpen={isOpen} 
-            toggle={onClickBtnClose} 
-            className="utilisateur-modal" 
-            style={{ direction: direction }}
+  <div className="row">
+    <div className="col-6">
+      <FormGroup>
+        <Label for="description">{messages.description || "Description"}</Label>
+        <Input
+          type="textarea"
+          name="description"
+          id="description"
+          value={formData.description}
+          onChange={handleChange}
+          disabled={modeAside === "CONSULT" || modeAside === "DELETE"}
+        />
+      </FormGroup>
+    </div>
+    <div className="col-6">
+      <FormGroup>
+        <Label for="role">{messages.role || "Rôle"} *</Label>
+        <Input
+          type="select"
+          name="role"
+          id="role"
+          value={formData.role}
+          onChange={handleChange}
+          disabled={modeAside === "CONSULT" || modeAside === "DELETE"}
+          required
         >
-            <ModalHeader toggle={onClickBtnClose}>
-                {getTitle()}
-            </ModalHeader>
-            <ModalBody>
-                <Form onSubmit={handleSubmit}>
-                    <FormGroup>
-                        <Label for="username">{messages.username || "Nom d'utilisateur"} *</Label>
-                        <Input
-                            type="text"
-                            name="username"
-                            id="username"
-                            value={formData.username}
-                            onChange={handleChange}
-                            disabled={modeAside === "EDIT" || modeAside === "CONSULT" || modeAside === "DELETE"}
-                            required
-                        />
-                    </FormGroup>
+          {RoleOptions.map((role, index) => (
+            <option key={index} value={role.value}>
+              {messages[role.value] || role.label}
+            </option>
+          ))}
+        </Input>
+      </FormGroup>
+    </div>
+  </div>
 
-                    {(modeAside === 'ADD' || modeAside === 'EDIT') && (
-                        <FormGroup>
-                            <Label for="password">
-                                {messages.password || "Mot de passe"} 
-                                {modeAside === 'ADD' && ' *'}
-                            </Label>
-                            <Input
-                                type="password"
-                                name="password"
-                                id="password"
-                                value={formData.password}
-                                onChange={handleChange}
-                                required={modeAside === 'ADD'}
-                                placeholder={modeAside === 'EDIT' ? 
-                                    (messages.leaveEmptyToKeep || "Laisser vide pour ne pas modifier") : ""}
-                                disabled={modeAside === "CONSULT" || modeAside === "DELETE"}
-                            />
-                        </FormGroup>
-                    )}
+  {/* Champ de sélection du poste */}
+  <div className="row">
+    <div className="col-6">
+      <FormGroup>
+        <Label for="poste">{messages.poste || "Poste"}</Label>
+        <Input
+          type="select"
+          name="poste"
+          id="poste"
+          value={formData.poste ? formData.poste.idPoste : ""}
+          onChange={(e) => {
+            const selectedPoste = allPoste.find(p => p.idPoste === parseInt(e.target.value));
+            setFormData(prev => ({
+              ...prev,
+              poste: selectedPoste || null,
+            }));
+          }}
+          disabled={modeAside === "CONSULT" || modeAside === "DELETE"}
+        >
+          <option value="">-- Sélectionner un poste --</option>
+          {allPoste.map(poste => (
+            <option key={poste.idPoste} value={poste.idPoste}>
+              {poste.designation}
+            </option>
+          ))}
+        </Input>
+      </FormGroup>
+    </div>
+    <div className="col-6">
+      <FormGroup check>
+        <Label check>
+          <Input
+            type="checkbox"
+            name="actif"
+            checked={formData.actif}
+            onChange={handleChange}
+            disabled={modeAside === "CONSULT" || modeAside === "DELETE"}
+          />
+          {messages.active || "Actif"}
+        </Label>
+      </FormGroup>
+    </div>
+  </div>
+</Form>
 
-                    <FormGroup>
-                        <Label for="nom">{messages.nom || "Nom"} *</Label>
-                        <Input
-                            type="text"
-                            name="nom"
-                            id="nom"
-                            value={formData.nom}
-                            onChange={handleChange}
-                            disabled={modeAside === "CONSULT" || modeAside === "DELETE"}
-                            required
-                        />
-                    </FormGroup>
+        </ModalBody>
 
-                    <FormGroup>
-                        <Label for="prenom">{messages.prenom || "Prénom"} *</Label>
-                        <Input
-                            type="text"
-                            name="prenom"
-                            id="prenom"
-                            value={formData.prenom}
-                            onChange={handleChange}
-                            disabled={modeAside === "CONSULT" || modeAside === "DELETE"}
-                            required
-                        />
-                    </FormGroup>
-
-                    <FormGroup>
-                        <Label for="description">{messages.description || "Description"}</Label>
-                        <Input
-                            type="textarea"
-                            name="description"
-                            id="description"
-                            value={formData.description}
-                            onChange={handleChange}
-                            disabled={modeAside === "CONSULT" || modeAside === "DELETE"}
-                        />
-                    </FormGroup>
-
-                    <FormGroup>
-                        <Label for="role">{messages.role || "Rôle"} *</Label>
-                        <Input
-                            type="select"
-                            name="role"
-                            id="role"
-                            value={formData.role}
-                            onChange={handleChange}
-                            disabled={modeAside === "CONSULT" || modeAside === "DELETE"}
-                            required
-                        >
-                            {RoleOptions.map((role, index) => (
-                                <option key={index} value={role.value}>
-                                    {messages[role.value] || role.label}
-                                </option>
-                            ))}
-                        </Input>
-                    </FormGroup>
-
-                    <FormGroup>
-                        <Label for="poste">{messages.poste || "Poste"}</Label>
-                        <SelectBox
-                            value={formData.poste ? formData.poste.idPoste : null}
-                            dataSource={allPoste}
-                            displayExpr="designation"
-                            valueExpr="idPoste"
-                            onValueChanged={e => handlePosteChange(e.value)}
-                            disabled={modeAside === "CONSULT" || modeAside === "DELETE"}
-                            
-                        />
-                    </FormGroup>
-
-                    <FormGroup check>
-                        <Label check>
-                            <Input
-                                type="checkbox"
-                                name="actif"
-                                checked={formData.actif}
-                                onChange={handleChange}
-                                disabled={modeAside === "CONSULT"}
-                            />
-                            {messages.active || "Actif"}
-                        </Label>
-                    </FormGroup>
-                </Form>
-            </ModalBody>
-
-            <ModalFooter>
-                {renderFooterButtons()}
-            </ModalFooter>
-
-            <Modal isOpen={isOpenModalConfirmation} toggle={handleCloseModalConfirmation}>
-                <ModalBody>
-                    {messages.confirmAction || "Êtes-vous sûr de vouloir effectuer cette action?"}
-                </ModalBody>
-                <ModalFooter>
-                    <Button color="secondary" onClick={handleCloseModalConfirmation}>
-                        {messages.cancel || "Annuler"}
-                    </Button>
-                    <Button color="primary" onClick={handleSubmit}>
-                        {messages.confirm || "Confirmer"}
-                    </Button>
-                </ModalFooter>
-            </Modal>
-        </Modal>
-    );
-};
+        <ModalFooter>{renderFooterButtons()}</ModalFooter>
+      </Modal>
+      {/* Modal de confirmation (utilisée pour d'autres fonctionnalités) */}
+      <Modal
+        isOpen={isOpenModalConfirmation}
+        toggle={() => dispatch(handleCloseModalConfirmation())}
+      >
+        <ModalHeader toggle={() => dispatch(handleCloseModalConfirmation())}>
+          {messages.confirmation || "Confirmation"}
+        </ModalHeader>
+        <ModalBody>{messageToShow}</ModalBody>
+        <ModalFooter>
+          <Button
+            color="secondary"
+            onClick={() => {
+              if (
+                actionBtnModalConfirmation &&
+                typeof actionBtnModalConfirmation.handleBtnCancelModalConfirmation ===
+                  "function"
+              ) {
+                actionBtnModalConfirmation.handleBtnCancelModalConfirmation();
+              } else {
+                dispatch(handleCloseModalConfirmation());
+              }
+            }}
+          >
+            {messages.cancel || "Annuler"}
+          </Button>
+          <Button color="primary" onClick={handleConfirmAction}>
+            {messages.confirm || "Confirmer"}
+          </Button>
+        </ModalFooter>
+      </Modal>
+    </>
+  );
+}; // Make sure this closing brace for the component function is here
 
 export default UtilisateurAside;

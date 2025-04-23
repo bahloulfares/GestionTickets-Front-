@@ -72,8 +72,8 @@ export default function ClientAsideReducer(state = initialState, action) {
       return {
         ...state,
         isOpenModalConfirmation: true,
-        messageToShow: action.messageToShow,
-        actionBtnModalConfirmation: action.actionBtnModalConfirmation,
+        messageToShow: action.payload.message,
+        actionBtnModalConfirmation: action.payload.actionBtnModalConfirmation
       };
     case CLOSE_MODAL_CONFIRMATION_CLIENT:
       return {

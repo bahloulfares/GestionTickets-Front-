@@ -10,7 +10,8 @@ const ClientAside = () => {
     const dispatch = useDispatch();
     const ClientAsideReducer = useSelector(state => state.ClientAsideReducer);
     const messages = useSelector(state => state.intl.messages);
-    
+    const { successCallback } = ClientAsideReducer;
+
     const [formData, setFormData] = useState({
         nom: '',
         telephone: '',
@@ -45,6 +46,7 @@ const ClientAside = () => {
         }));
     };
     
+    // Replace the handleDelete and handleConfirmDelete functions with this implementation
     const handleSubmit = (e) => {
         e.preventDefault();
         
@@ -72,35 +74,47 @@ const ClientAside = () => {
                 .catch(error => {
                     notify(messages.ErrorEdit || "Erreur lors de la modification du client", "error", notifyOptions);
                 });
+        } else if (ClientAsideReducer.modeAside === 'DELETE') {
+            // Use the confirmation modal for delete
+            const handleBtnConfirmerModalConfirmation = () => {
+                dispatch(handleCloseModalConfirmation());
+                dispatch(deleteClient(formData.idClient))                
+                .then(() => {
+                    notify(messages.SuccessDelete || "Client supprimé avec succès", "success", notifyOptions);
+                    dispatch(handleClose());
+                    if (ClientAsideReducer.successCallback) {
+                        ClientAsideReducer.successCallback();
+                    }
+                })
+                .catch((error) => {
+                    notify(messages.ErrorDelete || "Erreur lors de la suppression du client", "error", notifyOptions);
+                    console.error("Delete client error:", error);
+                });
+            };
+            
+            const handleBtnCancelModalConfirmation = () => {
+                dispatch(handleCloseModalConfirmation());
+            };
+            
+            dispatch(handleOpenModalConfirmation(
+                "Êtes-vous sûr de vouloir supprimer ce client ?",
+                handleBtnCancelModalConfirmation,
+                handleBtnConfirmerModalConfirmation
+            ));
+            return; // Ajout de cette ligne pour empêcher l'exécution du reste du code
         }
     };
     
-    const handleDelete = () => {
-        dispatch(deleteClient(ClientAsideReducer.selectedClient.idClient))
-            .then(() => {
-                notify(messages.SuccessDelete || "Client supprimé avec succès", "success", notifyOptions);
-                dispatch(handleClose());
-                if (ClientAsideReducer.successCallback) {
-                    ClientAsideReducer.successCallback();
-                }
-            })
-            .catch(error => {
-                notify(messages.ErrorDelete || "Erreur lors de la suppression du client", "error", notifyOptions);
-            });
-    };
-    
-    const handleConfirmDelete = () => {
-        // Make sure we're directly calling handleDelete instead of passing it to the modal
-        handleDelete();
-        
-        // Or if you want to keep the confirmation modal:
-        /*
-        dispatch(handleOpenModalConfirmation(
-            messages.ConfirmDelete || "Êtes-vous sûr de vouloir supprimer ce client ?",
-            () => dispatch(handleCloseModalConfirmation()),
-            handleDelete
-        ));
-        */
+    // Add this function to handle confirmation actions
+    const handleConfirmAction = () => {
+        console.log("handleConfirmAction called", ClientAsideReducer.actionBtnModalConfirmation);
+        if (ClientAsideReducer.actionBtnModalConfirmation && 
+            typeof ClientAsideReducer.actionBtnModalConfirmation.handleBtnConfirmerModalConfirmation === "function") {
+            ClientAsideReducer.actionBtnModalConfirmation.handleBtnConfirmerModalConfirmation();
+        } else {
+            console.error("La fonction de confirmation n'est pas disponible");
+            dispatch(handleCloseModalConfirmation());
+        }
     };
     
     const renderForm = () => {
@@ -138,7 +152,6 @@ const ClientAside = () => {
                     />
                 </FormGroup>
                 
-                {/* ... rest of the form remains unchanged ... */}
                 <FormGroup>
                     <Label for="telephone">{messages.Telephone || "Téléphone"}</Label>
                     <Input
@@ -186,11 +199,10 @@ const ClientAside = () => {
                 )}
                 
                 {ClientAsideReducer.modeAside === 'DELETE' && (
-                    <Button color="danger" onClick={handleConfirmDelete}>
+                    <Button color="danger" type="submit">
                         {messages.Delete || "Supprimer"}
                     </Button>
                 )}
-                
                 <Button color="secondary" onClick={() => dispatch(handleClose())} className="ml-2">
                     {messages.Cancel || "Annuler"}
                 </Button>
@@ -210,6 +222,43 @@ const ClientAside = () => {
                 <ModalBody>
                     {renderForm()}
                 </ModalBody>
+            </Modal>
+            
+            {/* Add the confirmation modal */}
+            <Modal
+                isOpen={ClientAsideReducer.isOpenModalConfirmation}
+                toggle={() => dispatch(handleCloseModalConfirmation())}
+                className="modal-dialog-centered"
+                size="sm"
+            >
+                <ModalHeader toggle={() => dispatch(handleCloseModalConfirmation())}>
+                    {messages.Confirmation || "Confirmation"}
+                </ModalHeader>
+                <ModalBody>
+                    Êtes-vous sûr de vouloir supprimer ce client ?
+                </ModalBody>
+                <ModalFooter>
+                    <Button color="secondary" onClick={() => dispatch(handleCloseModalConfirmation())}>
+                        {messages.Cancel || "Annuler"}
+                    </Button>
+                    <Button color="primary" onClick={() => {
+                        dispatch(handleCloseModalConfirmation());
+                        dispatch(deleteClient(formData.idClient))
+                            .then(() => {
+                                notify(messages.SuccessDelete || "Client supprimé avec succès", "success", notifyOptions);
+                                dispatch(handleClose());
+                                if (ClientAsideReducer.successCallback) {
+                                    ClientAsideReducer.successCallback();
+                                }
+                            })
+                            .catch((error) => {
+                                notify(messages.ErrorDelete || "Erreur lors de la suppression du client", "error", notifyOptions);
+                                console.error("Delete client error:", error);
+                            });
+                    }}>
+                        {messages.Confirm || "Confirmer"}
+                    </Button>
+                </ModalFooter>
             </Modal>
         </>
     );
