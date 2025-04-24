@@ -14,6 +14,7 @@ import ClientPage from '../Client/ClientPage';
 // import DemandePage from '../Demande/DemandePage';
 // import EquipePage from '../Equipe/EquipePage';
 import { Role } from '../../Helper/Enums/Role';
+import EquipePage from '../Equipe/EquipePage'
 
 const Menu_Hooks = () => {
   const dispatch = useDispatch()
@@ -118,7 +119,7 @@ const Menu_Hooks = () => {
             key: `${submenu.codMnP}`,
             title: title,
             icon: <i className={submenu.logo} />,
-            component: <div>Equipes Page (Component not yet implemented)</div>,
+            component: <EquipePage/>
           }))
           break;
       }

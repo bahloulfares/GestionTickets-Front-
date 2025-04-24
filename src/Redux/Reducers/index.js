@@ -14,7 +14,8 @@ import ModuleAsideReducer from './Module/ModuleAside';
 // Import des nouveaux reducers Client
 import ClientsReducer from './Client/Client';
 import ClientAsideReducer from './Client/ClientAside';
-
+import EquipesReducer from './Equipe/Equipe';
+import EquipeAsideReducer from './Equipe/EquipeAside';
 export default combineReducers({
     MenuTabsReducer, MenuReducer, HeaderReducer, intl: intlReducer
     , ModalReducerImpression
@@ -22,5 +23,6 @@ export default combineReducers({
     , UtilisateursReducer, UtilisateurAsideReducer
     , ModulesReducer, ModuleAsideReducer
     , ClientsReducer, ClientAsideReducer
-    , LoginReducer
+    , LoginReducer,EquipesReducer,
+    EquipeAsideReducer
 });

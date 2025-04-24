@@ -1,0 +1,5 @@
+export const GET_ALL_EQUIPE = 'GET_ALL_EQUIPE';
+export const ADD_NEW_EQUIPE = 'ADD_NEW_EQUIPE';
+export const GET_EQUIPE_BY_CODE = 'GET_EQUIPE_BY_CODE';
+export const DELETE_EQUIPE = 'DELETE_EQUIPE';
+export const EDIT_EQUIPE = 'EDIT_EQUIPE';

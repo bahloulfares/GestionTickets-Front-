@@ -33,18 +33,18 @@ export default function LoginForm() {
   // Configuration des éditeurs avec traductions
   const localizedEmailOptions = { 
     stylingMode: 'filled', 
-    placeholder: intl.messages?.login || 'Login', 
+    placeholder: intl.messages?.loginPlaceholder || 'Login', 
     mode: 'text' 
   };
   
   const localizedPasswordOptions = { 
     stylingMode: 'filled', 
-    placeholder: intl.messages?.password || 'Password', 
+    placeholder: intl.messages?.passwordPlaceholder || 'Password', 
     mode: 'password' 
   };
   
   const localizedRememberMeOptions = { 
-    text: intl.messages?.rememberMe || 'Enregistrer le mot de passe', 
+    text: intl.messages?.savePassword || 'Enregistrer le mot de passe', 
     elementAttr: { class: 'form-text' } 
   };
 
@@ -98,7 +98,7 @@ export default function LoginForm() {
           editorType={'dxTextBox'}
           editorOptions={localizedEmailOptions}
         >
-          <RequiredRule message={intl.messages?.validationRequired || "Login is required"} />
+          <RequiredRule message={intl.messages?.loginRequired || "Login is required"} />
           <Label visible={false} />
         </Item>
         <Item
@@ -126,7 +126,7 @@ export default function LoginForm() {
               {loading ? (
                 <LoadIndicator width="24px" height="24px" visible={true} />
               ) : (
-                intl.messages?.submit || 'Connexion'
+                intl.messages?.loginButton || 'Connexion'
               )}
             </span>
           </ButtonOptions>
