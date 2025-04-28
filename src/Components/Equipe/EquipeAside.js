@@ -58,9 +58,9 @@ const EquipeAside = () => {
     dispatch(getAllUtilisateurs());
   }, [dispatch]);
 
-  // Update form when selected equipe changes
+  // Update form when selected equipe changes or when modal opens/closes
   useEffect(() => {
-    if (selectedEquipe) {
+    if (selectedEquipe && modeAside !== "ADD") {
       console.log("Équipe sélectionnée:", selectedEquipe);
       setFormData({
         idEquipe: selectedEquipe.idEquipe || null,
@@ -69,6 +69,7 @@ const EquipeAside = () => {
         actif: selectedEquipe.actif !== undefined ? selectedEquipe.actif : true,
       });
     } else {
+      // Reset form data when in ADD mode or when no team is selected
       setFormData({
         idEquipe: null,
         designation: "",
@@ -76,7 +77,7 @@ const EquipeAside = () => {
         actif: true,
       });
     }
-  }, [selectedEquipe]);
+  }, [selectedEquipe, modeAside, isOpen]);
 
   // Assurez-vous que les utilisateurs sont chargés avant d'ouvrir le modal
   useEffect(() => {

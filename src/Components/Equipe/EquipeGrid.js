@@ -187,11 +187,21 @@ const EquipeGrid = () => {
             calculateCellValue: formatUsers,
             width: 300
         },
-        {
-            dataField: 'actif',
-            caption: messages.status || 'Statut',
-            calculateCellValue: formatActif,
-            width: 100
+        { 
+            dataField: 'actif', 
+            caption: messages.Active || "Active",
+            dataType: 'boolean',
+            allowSorting: true,
+            allowFiltering: true,
+            width: 80,
+            cellTemplate: (container, options) => {
+                const div = document.createElement('div');
+                div.className = 'text-center';
+                div.innerHTML = options.value ? 
+                    '<i class="fas fa-check text-success"></i>' : 
+                    '<i class="fas fa-times text-danger"></i>';
+                container.appendChild(div);
+            }
         }
     ];
 

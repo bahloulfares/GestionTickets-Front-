@@ -33,18 +33,18 @@ export default function LoginForm() {
   // Configuration des éditeurs avec traductions
   const localizedEmailOptions = { 
     stylingMode: 'filled', 
-    placeholder: intl.messages?.loginPlaceholder || 'Login', 
+    placeholder: intl.messages?.login || 'Identifiant', 
     mode: 'text' 
   };
   
   const localizedPasswordOptions = { 
     stylingMode: 'filled', 
-    placeholder: intl.messages?.passwordPlaceholder || 'Password', 
+    placeholder: intl.messages?.MotDePasse || 'Mot de passe', 
     mode: 'password' 
   };
   
   const localizedRememberMeOptions = { 
-    text: intl.messages?.savePassword || 'Enregistrer le mot de passe', 
+    text: intl.messages?.rememberMe || 'Se souvenir de moi', 
     elementAttr: { class: 'form-text' } 
   };
 

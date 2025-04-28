@@ -10,9 +10,6 @@ import LoginForm from '../LoginForm/LoginForm'
 import ModulePage from '../Module/ModulePage'
 // Ajouter l'import pour ClientPage
 import ClientPage from '../Client/ClientPage';
-// Remove these imports that don't exist
-// import DemandePage from '../Demande/DemandePage';
-// import EquipePage from '../Equipe/EquipePage';
 import { Role } from '../../Helper/Enums/Role';
 import EquipePage from '../Equipe/EquipePage'
 

@@ -118,7 +118,7 @@ const UtilisateurAside = () => {
 
       setFormData({
         username: selectedUtilisateur.username || "",
-        password: "", // Ne pas afficher le mot de passe existant
+        password: selectedUtilisateur.password ||"",
         nom: selectedUtilisateur.nom || "",
         prenom: selectedUtilisateur.prenom || "",
         description: selectedUtilisateur.description || "",
@@ -316,13 +316,13 @@ const UtilisateurAside = () => {
         const handleBtnConfirmerModalConfirmation = () => {
             dispatch(handleCloseModalConfirmation());
             dispatch(deleteUtilisateur(userData.username))                .then(() => {
-                    notify(messages.deleteSuccess || "Module deleted successfully", "success", notifyOptions);
+                    notify(messages.deleteSuccess || "Utilisateur deleted successfully", "success", notifyOptions);
                     dispatch(handleClose());
                     if (successCallback) successCallback();
                 })
                 .catch((error) => {
-                    notify(messages.deleteFailed || "Failed to delete module", "error", notifyOptions);
-                    console.error("Delete module error:", error);
+                    notify(messages.deleteFailed || "Failed to delete utilisateur", "error", notifyOptions);
+                    console.error("Delete utilisateur error:", error);
                 });
         };
         
@@ -331,7 +331,7 @@ const UtilisateurAside = () => {
         };
         
         dispatch(handleOpenModalConfirmation(
-            messages.confirmDelete || "Are you sure you want to delete this module?",
+            messages.confirmDelete || "Are you sure you want to delete this utilisateur?",
             handleBtnCancelModalConfirmation,
             handleBtnConfirmerModalConfirmation
         ));

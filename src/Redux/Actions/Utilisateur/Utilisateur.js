@@ -1,8 +1,11 @@
+// Import notify for showing notifications
 import axios from 'axios';
 import Ressources from '../../../Helper/Ressources';
 import { GET_ALL_UTILISATEUR, ADD_NEW_UTILISATEUR, DELETE_UTILISATEUR, EDIT_UTILISATEUR, GET_UTILISATEUR_BY_CODE } from "../../Constants/Utilisateur/Utilisateur";
-// Fix the import path to use the correct function from UtilisateurAside
 import { handleCloseModalConfirmation, handleClose } from './UtilisateurAside';
+import notify from 'devextreme/ui/notify';
+import { notifyOptions } from '../../../Helper/Config';
+import store from '../../Store/Store';
 
 export const getAllUtilisateurs = (dataGrid) => {
     return dispatch => {
@@ -45,6 +48,14 @@ export const getUtilisateurByCode = (username) => {
             // Fix the URL format
             axios.get(`${Ressources.CoreUrlB}/template-core/api/users/${encodeURIComponent(username)}`)
                 .then(res => {
+                    // Make sure we have the password in the response data
+                    console.log("User data retrieved:", res.data);
+                    
+                    // Ensure idEquipe is preserved in the response data
+                    if (res.data && res.data.idEquipe !== undefined) {
+                        console.log("User's idEquipe preserved:", res.data.idEquipe);
+                    }
+                    
                     dispatch({
                         type: GET_UTILISATEUR_BY_CODE,
                         payload: res.data
@@ -52,6 +63,7 @@ export const getUtilisateurByCode = (username) => {
                     resolve(res.data);
                 })
                 .catch(error => {
+                    console.error("Error retrieving user data:", error);
                     reject(error);
                 });
         });
@@ -121,70 +133,83 @@ export const addNewUtilisateur = (data) => {
 export const editUtilisateur = (utilisateur) => {
     return dispatch => {
         return new Promise((resolve, reject) => {
-            // Création d'une copie pour éviter de modifier l'objet original
-            let utilisateurModifie = {...utilisateur};
-            
-            // Traitement du poste de manière cohérente avec la fonction d'ajout
-            if (utilisateur.poste) {
-                console.log("Modification - Données du poste reçues:", utilisateur.poste);
-                
-                // Si poste est un objet (sélectionné depuis une liste déroulante)
-                if (typeof utilisateur.poste === 'object' && utilisateur.poste !== null) {
-                    utilisateurModifie.idPoste = utilisateur.poste.idPoste;
-                    console.log("Modification - ID du poste extrait de l'objet:", utilisateurModifie.idPoste);
-                } 
-                // Si poste est déjà un nombre (ID direct)
-                else if (typeof utilisateur.poste === 'number') {
-                    utilisateurModifie.idPoste = utilisateur.poste;
-                    console.log("Modification - ID du poste (nombre):", utilisateurModifie.idPoste);
-                } 
-                // Si poste est une chaîne qui peut être convertie en nombre
-                else if (typeof utilisateur.poste === 'string' && !isNaN(parseInt(utilisateur.poste))) {
-                    utilisateurModifie.idPoste = parseInt(utilisateur.poste);
-                    console.log("Modification - ID du poste converti de chaîne en nombre:", utilisateurModifie.idPoste);
-                }
-                
-                // Suppression de l'objet poste car le backend attend seulement l'ID
-                delete utilisateurModifie.poste;
-            }
-            
-            // Conversion de id_poste en idPoste si nécessaire
-            if (utilisateurModifie.id_poste !== undefined) {
-                utilisateurModifie.idPoste = utilisateurModifie.id_poste;
-                delete utilisateurModifie.id_poste;
-            }
-            
-            // Suppression des champs non attendus par le backend
-            if (utilisateurModifie.posteDesignation) {
-                delete utilisateurModifie.posteDesignation;
-            }
-            
-            console.log("Utilisateur à modifier:", utilisateurModifie);
-            
-            // Fermer la modal avant d'envoyer la requête
-            dispatch(handleCloseModalConfirmation());
-            
-            axios.put(`${Ressources.CoreUrlB}/template-core/api/users`, utilisateurModifie)
-                .then(res => {
-                    dispatch({
-                        type: EDIT_UTILISATEUR,
-                        payload: res.data
-                    });
+            // First, get the latest user data from the server to ensure we have the current idEquipe
+            dispatch(getUtilisateurByCode(utilisateur.username))
+                .then(currentUserData => {
+                    // Création d'une copie pour éviter de modifier l'objet original
+                    let utilisateurModifie = {...utilisateur};
                     
-                    // Fermer le panneau latéral après succès
-                    dispatch(handleClose());
+                    // Ensure we preserve the idEquipe from the server if it exists
+                    if (currentUserData && currentUserData.idEquipe !== undefined) {
+                        utilisateurModifie.idEquipe = currentUserData.idEquipe;
+                        console.log("Modification - idEquipe récupéré du serveur:", utilisateurModifie.idEquipe);
+                    }
                     
-                    resolve(res.data);
+                    // Traitement du poste de manière cohérente avec la fonction d'ajout
+                    if (utilisateur.poste) {
+                        console.log("Modification - Données du poste reçues:", utilisateur.poste);
+                        
+                        // Si poste est un objet (sélectionné depuis une liste déroulante)
+                        if (typeof utilisateur.poste === 'object' && utilisateur.poste !== null) {
+                            utilisateurModifie.idPoste = utilisateur.poste.idPoste;
+                            console.log("Modification - ID du poste extrait de l'objet:", utilisateurModifie.idPoste);
+                        } 
+                        // Si poste est déjà un nombre (ID direct)
+                        else if (typeof utilisateur.poste === 'number') {
+                            utilisateurModifie.idPoste = utilisateur.poste;
+                            console.log("Modification - ID du poste (nombre):", utilisateurModifie.idPoste);
+                        } 
+                        // Si poste est une chaîne qui peut être convertie en nombre
+                        else if (typeof utilisateur.poste === 'string' && !isNaN(parseInt(utilisateur.poste))) {
+                            utilisateurModifie.idPoste = parseInt(utilisateur.poste);
+                            console.log("Modification - ID du poste converti de chaîne en nombre:", utilisateurModifie.idPoste);
+                        }
+                        
+                        // Suppression de l'objet poste car le backend attend seulement l'ID
+                        delete utilisateurModifie.poste;
+                    }
+                    
+                    // Conversion de id_poste en idPoste si nécessaire
+                    if (utilisateurModifie.id_poste !== undefined) {
+                        utilisateurModifie.idPoste = utilisateurModifie.id_poste;
+                        delete utilisateurModifie.id_poste;
+                    }
+                    
+                    // Suppression des champs non attendus par le backend
+                    if (utilisateurModifie.posteDesignation) {
+                        delete utilisateurModifie.posteDesignation;
+                    }
+                    
+                    console.log("Utilisateur à modifier (final):", utilisateurModifie);
+                    
+                    // Fermer la modal avant d'envoyer la requête
+                    dispatch(handleCloseModalConfirmation());
+                    
+                    axios.put(`${Ressources.CoreUrlB}/template-core/api/users`, utilisateurModifie)
+                        .then(res => {
+                            dispatch({
+                                type: EDIT_UTILISATEUR,
+                                payload: res.data
+                            });
+                            
+                            // Fermer le panneau latéral après succès
+                            dispatch(handleClose());
+                            
+                            resolve(res.data);
+                        })
+                        .catch(error => {
+                            console.error("Erreur lors de la modification de l'utilisateur:", error);
+                            // Ne pas fermer le panneau en cas d'erreur
+                            reject(error);
+                        });
                 })
                 .catch(error => {
-                    console.error("Erreur lors de la modification de l'utilisateur:", error);
-                    // Ne pas fermer le panneau en cas d'erreur
+                    console.error("Erreur lors de la récupération des données utilisateur:", error);
                     reject(error);
                 });
         });
     };
 };
-
 export const deleteUtilisateur = (username) => {
     return dispatch => {
         return new Promise((resolve, reject) => {
@@ -194,6 +219,11 @@ export const deleteUtilisateur = (username) => {
                         type: DELETE_UTILISATEUR,
                         payload: username
                     });
+                    // Show success notification with longer duration (5 seconds = 5000ms)
+                    notify("Utilisateur supprimé avec succès", "success", {
+                        ...notifyOptions,
+                        timeout: 5000
+                    });
                     // Close modal confirmation to prevent dimming effect
                     dispatch(handleCloseModalConfirmation());
                     // Also close the aside panel
@@ -202,10 +232,48 @@ export const deleteUtilisateur = (username) => {
                 })
                 .catch(error => {
                     console.error("Erreur lors de la suppression de l'utilisateur:", error);
+                    
+                    // Handle specific error for user assigned to team
+                    if (error.response && error.response.data) {
+                        const errorData = error.response.data;
+                        const errorMessage = errorData.message || errorData.error || "";
+                        
+                        if (errorMessage.includes("user.assigned.to.team") || 
+                            errorMessage.includes("assigned to team")) {
+                            // Extract team name if available
+                            let teamName = "";
+                            const teamMatch = errorMessage.match(/assigned to team (.*?)\./);
+                            if (teamMatch && teamMatch[1]) {
+                                teamName = teamMatch[1];
+                            }
+                            
+                            // Show specific error message about team assignment with longer duration
+                            notify(
+                                `Impossible de supprimer l'utilisateur car il est assigné à l'équipe "${teamName}". 
+                                Veuillez d'abord retirer l'utilisateur de l'équipe.`, 
+                                "error", 
+                                {
+                                    ...notifyOptions,
+                                    timeout: 5000
+                                }
+                            );
+                        } else {
+                            // Generic error message with longer duration
+                            notify("Erreur lors de la suppression de l'utilisateur", "error", {
+                                ...notifyOptions,
+                                timeout: 5000
+                            });
+                        }
+                    } else {
+                        // Generic error message with longer duration
+                        notify("Erreur lors de la suppression de l'utilisateur", "error", {
+                            ...notifyOptions,
+                            timeout: 5000
+                        });
+                    }
+                    
                     // Close modal confirmation even on error
                     dispatch(handleCloseModalConfirmation());
-                    // Also close the aside panel on error
-                    dispatch(handleClose());
                     
                     reject(error);
                 });

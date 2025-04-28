@@ -1,9 +1,8 @@
 export default {
     // Mots-clés existants
-    "module": "Gestion des clients",
+    "module": "Gestion des Demandes clients",
     "home": "Accueil",
     "search": "Rechercher",
-    "InvalidPriceAndPercentage": "Veuillez vérifier les prix et les tarifs",
     "consult": "Consulter",
     "add": "Ajouter",
     "edit": "Modifier",
@@ -31,17 +30,26 @@ export default {
     "designationSec": "Désignation arabe",
     "mail": "Courriel",
     "CodeClient": "Code Client",
-    "login": "Identifiant",
-    "MotDePasse": "Mot de passe",
+    "InvalidPriceAndPercentage": "Veuillez vérifier les prix et les tarifs",
     "required": " est obligatoire",
     "WantToDeleteAnyway": "Voulez-vous vraiment supprimer ?",
     
-    // Nouveaux mots-clés pour l'authentification
+    // Formulaire de connexion
+    "login": "Identifiant",
+    "MotDePasse": "Mot de passe",
+    "password": "Mot de passe",
+    "rememberMe": "Se souvenir de moi",
+    "submit": "Se connecter",
+    "loginPlaceholder": "Identifiant",
+    "passwordPlaceholder": "Mot de passe",
+    "savePassword": "Enregistrer le mot de passe",
+    "loginButton": "Se connecter",
+    
+    // Mots-clés pour l'authentification
     "authenticationError": "Erreur d'authentification",
     "sessionExpired": "Votre session a expiré",
     "loginRequired": "Veuillez vous connecter",
     "invalidCredentials": "Identifiants invalides",
-    "rememberMe": "Se souvenir de moi",
     "forgotPassword": "Mot de passe oublié",
     "resetPassword": "Réinitialiser le mot de passe",
     "changePassword": "Changer le mot de passe",
@@ -73,7 +81,6 @@ export default {
     "back": "Retour",
     "next": "Suivant",
     "previous": "Précédent",
-    "submit": "Soumettre",
     "reset": "Réinitialiser",
     "filter": "Filtrer",
     "clearFilter": "Effacer les filtres",
@@ -84,17 +91,27 @@ export default {
     "yes": "Oui",
     "no": "Non",
     
+    // Éléments du menu contextuel
+    "applyToAllFamilies": "Appliquer sur toutes les familles",
+    "applyToAllSubFamilies": "Appliquer sur toutes les sous familles",
+    // Standardisation des clés
+     
+    // "lastName": "Nom",                
+    // "firstName": "Prénom",            
+    // "role": "Rôle",                   
+    "poste": "Poste",                 
+    //"active": "Actif",                
+    
     // Mots-clés pour les champs de formulaire
-    "username": "Nom d'utilisateur",
-    "password": "Mot de passe",
-    "email": "Adresse e-mail",
-    "phone": "Téléphone",
-    "address": "Adresse",
+    "Username": "Nom d'utilisateur",
+    "Email": "Adresse e-mail",
+    "Phone": "Téléphone",
+    "Address": "Adresse",
     "city": "Ville",
     "country": "Pays",
     "postalCode": "Code postal",
-    "firstName": "Prénom",
-    "lastName": "Nom",
+    "FirstName": "Prénom",
+    "LastName": "Nom",
     "birthDate": "Date de naissance",
     "gender": "Genre",
     "male": "Homme",
@@ -126,49 +143,6 @@ export default {
     "deleteError": "Erreur lors de la suppression",
     "confirmDelete": "Êtes-vous sûr de vouloir supprimer cet élément ?",
     
-    // Mots-clés pour la pagination
-    "page": "Page",
-    "of": "sur",
-    "itemsPerPage": "Éléments par page",
-    "firstPage": "Première page",
-    "lastPage": "Dernière page",
-    "totalItems": "Total des éléments",
-    
-    // Mots-clés pour les dates et heures
-    "today": "Aujourd'hui",
-    "yesterday": "Hier",
-    "tomorrow": "Demain",
-    "day": "Jour",
-    "week": "Semaine",
-    "month": "Mois",
-    "year": "Année",
-    "date": "Date",
-    "time": "Heure",
-    "dateTime": "Date et heure",
-    "startDate": "Date de début",
-    "endDate": "Date de fin",
-    "period": "Période",
-    
-    // Mots-clés pour les messages système
-    "confirmLogout": "Êtes-vous sûr de vouloir vous déconnecter ?",
-    "sessionTimeout": "Votre session va expirer dans {0} secondes",
-    "stayConnected": "Rester connecté",
-    "refreshSession": "Rafraîchir la session",
-    "unsavedChanges": "Vous avez des modifications non enregistrées",
-    "saveBeforeLeaving": "Voulez-vous enregistrer avant de quitter ?",
-    "discardChanges": "Ignorer les modifications",
-    
-    // Mots-clés spécifiques pour les clients
-    "clientManagement": "Gestion des clients",
-    "addClient": "Ajouter un client",
-    "editClient": "Modifier un client",
-    "deleteClient": "Supprimer un client",
-    "clientDetails": "Détails du client",
-    "clientList": "Liste des clients",
-    "clientCode": "Code client",
-    "clientName": "Nom du client",
-    "clientType": "Type de client",
-    
     // Mots-clés spécifiques pour les utilisateurs
     "userManagement": "Gestion des utilisateurs",
     "addUser": "Ajouter un utilisateur",
@@ -180,10 +154,56 @@ export default {
     "userSettings": "Paramètres utilisateur",
     "userPermissions": "Permissions utilisateur",
     
+    // Messages spécifiques pour la suppression d'utilisateur
+    "userAssignedToTeam": "Impossible de supprimer l'utilisateur car il est assigné à l'équipe \"{0}\"",
+    "removeFromTeamFirst": "Veuillez d'abord retirer l'utilisateur de l'équipe",
+    "addFailed": "Échec de l'ajout",
+    "editFailed": "Échec de la modification",
+    "deleteFailed": "Échec de la suppression",
+    "leaveEmptyToKeep": "Laisser vide pour conserver l'actuel",
+    "processingRequest": "Traitement en cours...",
+    
+  
+    
+    // Traductions supplémentaires liées aux tableaux
+    "Actions": "Actions",
+    "Filter": "Filtrer",
+    "All": "Tous",
+    
+    // Rôles utilisateur
+    "roleAdmin": "Administrateur",
+    "roleUser": "Utilisateur",
+    "roleManager": "Gestionnaire",
+    "roleOther": "Autre",
+    
     // Mots-clés pour les langues
     "language": "Langue",
     "selectLanguage": "Sélectionner la langue",
     "french": "Français",
     "english": "Anglais",
-    "arabic": "Arabe"
+    "arabic": "Arabe",
+        // Traductions pour les tableaux de données
+    "noResults": "Aucun résultat trouvé",
+    "rowsPerPage": "Lignes par page",
+    "itemsPerPage": "Éléments par page",
+    "firstPage": "Première page",
+    "lastPage": "Dernière page",
+    "nextPage": "Page suivante",
+    "previousPage": "Page précédente",
+    "sortAscending": "Tri croissant",
+    "sortDescending": "Tri décroissant",
+    "showColumns": "Afficher les colonnes",
+    "hideColumns": "Masquer les colonnes",
+    "filterColumns": "Filtrer les colonnes",
+    "resetFilters": "Réinitialiser les filtres",
+    "applyFilters": "Appliquer les filtres",
+        // Traductions pour la page d'accueil
+    "welcome": "Bienvenue",
+    "welcomeMessage": "Bienvenue dans l'application de gestion des demandes clients",
+    "quickAccess": "Accès rapide",
+    "recentActivity": "Activité récente",
+    "notifications": "Notifications",
+    "dashboard": "Tableau de bord",
+    "statistics": "Statistiques",
+    "reports": "Rapports",
 };
