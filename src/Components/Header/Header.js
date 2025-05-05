@@ -7,6 +7,9 @@ import { useSelector, useDispatch } from 'react-redux';
 import Cookies from "universal-cookie";
 import LanguageSelector from '../LanguageSelector/LanguageSelector';
 
+// Import the storage keys
+import { STORAGE_KEYS } from '../../Services/AuthService';
+
 /**
  * Contains brand, application name, breadcrumbs, username and logout button
  *
@@ -34,6 +37,15 @@ export class Header extends Component {
         const cookies = new Cookies();
         cookies.set('lang', lang, { path: '/' });
         window.location.reload();
+    }
+
+    // Méthode pour vérifier le statut de connexion
+    getConnectionStatus() {
+        const isAuthenticated = localStorage.getItem(STORAGE_KEYS.IS_AUTHENTICATED) === 'true';
+        return {
+            color: isAuthenticated ? '#2ecc71' : '#e74c3c', // Vert si connecté, rouge sinon
+            text: isAuthenticated ? 'Connecté' : 'Déconnecté'
+        };
     }
 
     render() {
@@ -90,8 +102,15 @@ export class Header extends Component {
                             <span name="_user" style={{ marginTop: '8px', color: 'white', display: 'inline-block' }}>
                                 <div style={{ fontSize: '17px' }}>
                                     <i className="fas fa-user" />
-                                    <span id="userName"
-                                        style={{ marginRight: '3px' }}>{this.props.intl.username}</span>
+                                    <span id="userName" style={{ marginRight: '3px' }}>{this.props.intl.username}</span>
+                                    <span className="connection-indicator" style={{ 
+                                        display: 'inline-block',
+                                        width: '10px',
+                                        height: '10px',
+                                        borderRadius: '50%',
+                                        backgroundColor: this.getConnectionStatus().color,
+                                        marginLeft: '5px'
+                                    }} title={this.getConnectionStatus().text}></span>
                                 </div>
                             </span>
                         </div>

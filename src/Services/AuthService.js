@@ -2,9 +2,8 @@ import axios from 'axios';
 import Ressources from '../Helper/Ressources';
 import store from '../Redux/Store/Store';
 import { LOGIN_SUCCESS, LOGIN_FAILURE, LOGOUT } from '../Redux/Constants/Login/Login';
-
-// Centralisation des clés de stockage
-const STORAGE_KEYS = {
+import notify from 'devextreme/ui/notify';// Centralisation des clés de stockage
+export const STORAGE_KEYS = {
     AUTH_TOKEN: 'authToken',
     USER_DATA: 'userData',
     IS_AUTHENTICATED: 'isAuthenticated'
@@ -91,6 +90,15 @@ const AuthService = {
             
             // Récupérer les informations utilisateur avec le token stocké
             const userData = await AuthService.getUserInfo(token);
+            
+            // Afficher une notification de connexion réussie
+            // notify({
+            //     message: `Connecté en tant que ${userData.username}`,
+            //     type: 'success',
+            //     displayTime: 3000,
+            //     position: { at: 'top right', my: 'top right' }
+            // });
+            
             return userData;
         } catch (error) {
             console.error('Erreur lors de la vérification de l\'authentification:', error);

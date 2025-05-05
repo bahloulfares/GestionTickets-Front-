@@ -5,13 +5,20 @@ import { GET_ALL_MODULE, ADD_NEW_MODULE, DELETE_MODULE, EDIT_MODULE, GET_MODULE_
 export const getAllModules = (dataGrid) => {
    return dispatch => {
        dataGrid.instance.beginCustomLoading();
-       axios.get(`${Ressources.CoreUrlB}/${Ressources.compteClient.api}/${Ressources.compteClient.modules}`).then(res => {
-           dispatch({
-               type: GET_ALL_MODULE,
-               payload: res.data
+       return axios.get(`${Ressources.CoreUrlB}/${Ressources.compteClient.api}/${Ressources.compteClient.modules}`)
+           .then(res => {
+               dispatch({
+                   type: GET_ALL_MODULE,
+                   payload: res.data
+               });
+               dataGrid.instance.endCustomLoading();
+               return res.data;
+           })
+           .catch(error => {
+               dataGrid.instance.endCustomLoading();
+               console.error("Erreur lors de la récupération des modules:", error);
+               throw error;
            });
-           dataGrid.instance.endCustomLoading();
-       })
    }
 }; 
 
