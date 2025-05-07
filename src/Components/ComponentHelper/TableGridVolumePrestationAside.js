@@ -67,79 +67,79 @@ export default TableGrid
 
 
 
-<DataGrid className='DataGrid'
-ref={dataGrid}
-dataSource={dataSource}
-keyExpr={'codeActe'}
-onToolbarPreparing={onToolbarPreparing}
-showColumnLines={true}
-showRowLines={true}
-showBorders={true}
-rowAlternationEnabled={true}
-rtlEnabled={true}
-wordWrapEnabled={true}
-columnAutoWidth={true}
-onRowPrepared={onRowPrepared}
-hoverStateEnabled={true}
->
+// <DataGrid className='DataGrid'
+// ref={dataGrid}
+// dataSource={dataSource}
+// keyExpr={'codeActe'}
+// onToolbarPreparing={onToolbarPreparing}
+// showColumnLines={true}
+// showRowLines={true}
+// showBorders={true}
+// rowAlternationEnabled={true}
+// rtlEnabled={true}
+// wordWrapEnabled={true}
+// columnAutoWidth={true}
+// onRowPrepared={onRowPrepared}
+// hoverStateEnabled={true}
+// >
 
-<Selection mode="multiple"
-    allowSelectAll={true}
-    deferred={true}
-/>
-<Export enabled={true} fileName={'listeDetailsRevisionVolumePrestationDTO'} allowExportSelectedData={true} />
-<FilterRow visible={true} applyFilter={true} />
-<HeaderFilter allowSearch={true} visible={true} />
-<Sorting mode={'single'} />
-<SearchPanel visible={false} placeholder={messages.search} />
-<Grouping contextMenuEnabled={true} autoExpandAll={true} />
-<ColumnChooser enabled={true} />
-<Column
-    dataField={'codeSaisiActe'}
-    caption={messages.codeSaisiPrestation}
-    sortOrder={'asc'}
-    allowEditing={false}
-    allowGrouping={false}
-/>
-<Column
-    dataField={'designationActe'}
-    caption={messages.prestation}
-    allowEditing={false}
-/>
+// <Selection mode="multiple"
+//     allowSelectAll={true}
+//     deferred={true}
+// />
+// <Export enabled={true} fileName={'listeDetailsRevisionVolumePrestationDTO'} allowExportSelectedData={true} />
+// <FilterRow visible={true} applyFilter={true} />
+// <HeaderFilter allowSearch={true} visible={true} />
+// <Sorting mode={'single'} />
+// <SearchPanel visible={false} placeholder={messages.search} width={500}/>
+// <Grouping contextMenuEnabled={true} autoExpandAll={true} />
+// <ColumnChooser enabled={true} />
+// <Column
+//     dataField={'codeSaisiActe'}
+//     caption={messages.codeSaisiPrestation}
+//     sortOrder={'asc'}
+//     allowEditing={false}
+//     allowGrouping={false}
+// />
+// <Column
+//     dataField={'designationActe'}
+//     caption={messages.prestation}
+//     allowEditing={false}
+// />
 
-<Column
-    dataField={'volumeReference'}
-    caption={messages.prixActuel}
-    customizeText={renderRoundDecimal}
-    allowEditing={false}
-/>
-<Column
-    dataField={'poucentageRevision'}
-    caption={messages.poucentageRevision}
-    customizeText={renderRoundDecimal}
-    allowEditing={editable}
-    setCellValue={handleChangeCellPoucentageRevision}
-/>
-<Column
-    dataField={'volumePrevisionnel'}
-    caption={messages.prixRevision}
-    customizeText={renderRoundDecimal}
-    allowEditing={editable}
-    setCellValue={handleChangeCellPrixRevision}
-/>
-<Column
-    type={'buttons'}
-    buttons={[{
-        hint: messages.historiqueTarifVolume,
-        icon: 'fa fa-chart-area',
-        onClick: courbeHistorique
-    }]}
-/>
-
-
+// <Column
+//     dataField={'volumeReference'}
+//     caption={messages.prixActuel}
+//     customizeText={renderRoundDecimal}
+//     allowEditing={false}
+// />
+// <Column
+//     dataField={'poucentageRevision'}
+//     caption={messages.poucentageRevision}
+//     customizeText={renderRoundDecimal}
+//     allowEditing={editable}
+//     setCellValue={handleChangeCellPoucentageRevision}
+// />
+// <Column
+//     dataField={'volumePrevisionnel'}
+//     caption={messages.prixRevision}
+//     customizeText={renderRoundDecimal}
+//     allowEditing={editable}
+//     setCellValue={handleChangeCellPrixRevision}
+// />
+// <Column
+//     type={'buttons'}
+//     buttons={[{
+//         hint: messages.historiqueTarifVolume,
+//         icon: 'fa fa-chart-area',
+//         onClick: courbeHistorique
+//     }]}
+// />
 
 
-<Editing mode={'cell'} allowUpdating={true} AllowAdding={true} AllowDeleting={true} AllowDragging={true} />
 
 
-</DataGrid>
+// <Editing mode={'cell'} allowUpdating={true} AllowAdding={true} AllowDeleting={true} AllowDragging={true} />
+
+
+// </DataGrid>

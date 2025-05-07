@@ -1,0 +1,576 @@
+import React, { useEffect, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { Button, Modal, ModalHeader, ModalBody, ModalFooter, Form, FormGroup, Label, Input } from 'reactstrap';
+import {
+  handleClose,
+  handleOpenModalConfirmation,
+  handleCloseModalConfirmation,
+} from "../../Redux/Actions/Demande/DemandeAside";
+import {
+  addDemande,
+  updateDemande,
+  deleteDemande,
+  getAllDemandes
+} from "../../Redux/Actions/Demande/Demande";
+import notify from "devextreme/ui/notify";
+import { notifyOptions } from '../../Helper/Config';
+import '../../assests/css/modals.css';
+import { ETATS_DEMANDE, PRIORITES_DEMANDE } from '../../Helper/Enums/Demande';
+import SelectBox from 'devextreme-react/select-box';
+import { fetchClientsForDemande, fetchModulesForDemande } from "../../Redux/Actions/Demande/DemandeAside";
+
+const DemandeAside = () => {
+  const dispatch = useDispatch();
+  const {
+    isOpen,
+    modeAside,
+    selectedDemande,
+    successCallback,
+    isOpenModalConfirmation,
+    messageToShow,
+    actionBtnModalConfirmation,
+    allClient,
+    allModule,
+    allEquipe,
+    allCollaborateur
+  } = useSelector((state) => state.DemandeAsideReducer);
+
+  // Récupérer l'utilisateur connecté depuis le store Redux
+  const userAuthentification = useSelector((state) => state.LoginReducer.userAuthentification);
+
+  const messages = useSelector((state) => state.intl.messages);
+  const direction = useSelector((state) => state.intl.direction);
+
+  const [formData, setFormData] = useState({
+    idDemande: null,
+    description: '',
+    dateCreation: new Date(),
+    dateEcheance: null,
+    etat: ETATS_DEMANDE.DEMANDE_CREEE,
+    priorite: PRIORITES_DEMANDE.NORMALE,
+    commentaire: '',
+    client: null,
+    module: null,
+    equipe: null,
+    collaborateur: null,
+    createur: null // Ajout du champ createur
+  });
+
+  // Mettre à jour le formulaire lorsque la demande sélectionnée change
+  useEffect(() => {
+    if (selectedDemande && modeAside !== "ADD") {
+      setFormData({
+        idDemande: selectedDemande.idDemande || null,
+        description: selectedDemande.description || '',
+        dateCreation: selectedDemande.dateCreation || new Date(),
+        dateEcheance: selectedDemande.dateEcheance || null,
+        etat: selectedDemande.etat || ETATS_DEMANDE.DEMANDE_CREEE,
+        priorite: selectedDemande.priorite || PRIORITES_DEMANDE.NORMALE,
+        commentaire: selectedDemande.commentaire || '',
+        client: selectedDemande.client || null,
+        module: selectedDemande.module || null,
+        equipe: selectedDemande.equipe || null,
+        collaborateur: selectedDemande.collaborateur || null,
+        createur: selectedDemande.createur || userAuthentification // Utiliser l'utilisateur connecté si pas de créateur existant
+      });
+    } else {
+      setFormData({
+        idDemande: null,
+        description: '',
+        dateCreation: new Date(),
+        dateEcheance: null,
+        etat: ETATS_DEMANDE.DEMANDE_CREEE,
+        priorite: PRIORITES_DEMANDE.NORMALE,
+        commentaire: '',
+        client: null,
+        module: null,
+        equipe: null,
+        collaborateur: null,
+        createur: userAuthentification // Définir l'utilisateur connecté comme créateur par défaut
+      });
+    }
+  }, [selectedDemande, modeAside, userAuthentification]);
+
+  // Ajoutez ceci dans votre composant, après les autres useEffect
+  useEffect(() => {
+    if (isOpen) {
+      // Charger les clients et les modules lorsque le modal s'ouvre
+      dispatch(fetchClientsForDemande());
+      dispatch(fetchModulesForDemande());
+    }
+  }, [isOpen, dispatch]);
+  
+
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData({
+      ...formData,
+      [name]: type === 'checkbox' ? checked : value
+    });
+  };
+
+  const handleSelectChange = (fieldName, value) => {
+    setFormData(prevData => ({
+      ...prevData,
+      [fieldName]: value
+    }));
+  };
+
+  const onClickBtnClose = () => {
+    dispatch(handleClose());
+  };
+
+  const getModalTitle = () => {
+    switch (modeAside) {
+      case 'ADD':
+        return messages.addDemande || 'Ajouter une demande';
+      case 'EDIT':
+        return messages.editDemande || 'Modifier une demande';
+      case 'DELETE':
+        return messages.deleteDemande || 'Supprimer une demande';
+      case 'CONSULT':
+        return messages.consultDemande || 'Consulter une demande';
+      default:
+        return '';
+    }
+  };
+
+  const handleSubmit = (e) => {
+    if (e) e.preventDefault();
+    
+    // Validation pour ADD et EDIT
+    if (modeAside !== 'DELETE' && !formData.description) {
+      notify(messages.descriptionRequired || "La description est obligatoire", "error", notifyOptions);
+      return;
+    }
+
+    console.log("Mode aside:", modeAside);
+    console.log("Form data:", formData);
+
+    // Désactiver le bouton pendant le traitement
+    const btnSubmit = document.querySelector(
+      ".modal-demande .btn-primary, .modal-demande .btn-danger"
+    );
+    if (btnSubmit) {
+      btnSubmit.disabled = true;
+      btnSubmit.innerHTML =
+        '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Traitement...';
+    }
+
+    let actionPromise;
+    const dataToSubmit = { 
+      ...formData,
+      // S'assurer que le créateur est toujours inclus dans les données soumises
+      createur: formData.createur || userAuthentification
+    };
+
+    try {
+      switch (modeAside) {
+        case 'ADD':
+          actionPromise = dispatch(addDemande(dataToSubmit));
+          break;
+        case 'EDIT':
+          actionPromise = dispatch(updateDemande(dataToSubmit));
+          break;
+        case 'DELETE':
+          actionPromise = dispatch(deleteDemande(dataToSubmit.idDemande));
+          break;
+        default:
+          console.error("Mode non reconnu:", modeAside);
+          return;
+      }
+
+      if (actionPromise && typeof actionPromise.then === "function") {
+        actionPromise
+          .then((result) => {
+            let messageSuccess = "";
+            if (modeAside === "ADD") {
+              messageSuccess = messages.demandeAddSuccess || "Demande ajoutée avec succès";
+            } else if (modeAside === "EDIT") {
+              messageSuccess = messages.demandeEditSuccess || "Demande modifiée avec succès";
+            } else if (modeAside === "DELETE") {
+              messageSuccess = messages.demandeDeleteSuccess || "Demande supprimée avec succès";
+            }
+
+            notify(messageSuccess, "success", notifyOptions);
+            
+            // Fermer les modales
+            dispatch(handleCloseModalConfirmation());
+            dispatch(handleClose());
+            
+            // Rafraîchir la grille si un callback est fourni
+            if (successCallback && typeof successCallback === "function") {
+              successCallback();
+            } else {
+              // Rafraîchir la liste des demandes si aucun callback n'est fourni
+              dispatch(getAllDemandes());
+            }
+          })
+          .catch((error) => {
+            let messageError = "";
+            if (modeAside === "ADD") {
+              messageError = messages.demandeAddError || "Erreur lors de l'ajout de la demande";
+            } else if (modeAside === "EDIT") {
+              messageError = messages.demandeEditError || "Erreur lors de la modification de la demande";
+            } else if (modeAside === "DELETE") {
+              messageError = messages.demandeDeleteError || "Erreur lors de la suppression de la demande";
+            }
+
+            notify(messageError, "error", notifyOptions);
+            console.error("Erreur:", error);
+            
+            // Fermer quand même les modales en cas d'erreur
+            dispatch(handleCloseModalConfirmation());
+            dispatch(handleClose());
+          })
+          .finally(() => {
+            // Réactiver le bouton après le traitement
+            if (btnSubmit) {
+              btnSubmit.disabled = false;
+              btnSubmit.innerHTML = modeAside === "DELETE" 
+                ? (messages.delete || "Supprimer") 
+                : (messages.save || "Enregistrer");
+            }
+          });
+      } else {
+        // Si actionPromise n'est pas une promesse, fermer quand même les modales
+        notify(messages.operationCompleted || "Opération terminée", "success", notifyOptions);
+        dispatch(handleCloseModalConfirmation());
+        dispatch(handleClose());
+      }
+    } catch (error) {
+      console.error("Erreur lors de l'exécution de l'action:", error);
+      notify(messages.unexpectedError || "Une erreur inattendue s'est produite", "error", notifyOptions);
+      
+      // Fermer quand même les modales en cas d'erreur
+      dispatch(handleCloseModalConfirmation());
+      dispatch(handleClose());
+      
+      // Réactiver le bouton en cas d'erreur
+      if (btnSubmit) {
+        btnSubmit.disabled = false;
+        btnSubmit.innerHTML = modeAside === "DELETE" 
+          ? (messages.delete || "Supprimer") 
+          : (messages.save || "Enregistrer");
+      }
+    }
+  };
+
+  const handleConfirmAction = () => {
+    if (modeAside === 'DELETE') {
+      // Pour le mode DELETE, afficher une confirmation avant de soumettre
+      const handleBtnConfirmerModalConfirmation = () => {
+        dispatch(handleCloseModalConfirmation());
+        handleSubmit();
+      };
+      
+      const handleBtnCancelModalConfirmation = () => {
+        dispatch(handleCloseModalConfirmation());
+      };
+      
+      const confirmMessage = messages.confirmDeleteDemande || "Êtes-vous sûr de vouloir supprimer cette demande ?";
+      
+      dispatch(handleOpenModalConfirmation(
+        confirmMessage,
+        handleBtnCancelModalConfirmation,
+        handleBtnConfirmerModalConfirmation
+      ));
+    } else {
+      // Pour les modes ADD et EDIT, soumettre directement sans confirmation
+      handleSubmit();
+    }
+  };
+
+  const renderFooterButtons = () => {
+    switch (modeAside) {
+      case 'ADD':
+        return (
+          <>
+            <Button color="secondary" onClick={onClickBtnClose}>
+              {messages.cancel || "Annuler"}
+            </Button>
+            <Button color="primary" onClick={handleConfirmAction}>
+              {messages.add || "Ajouter"}
+            </Button>
+          </>
+        );
+      case 'EDIT':
+        return (
+          <>
+            <Button color="secondary" onClick={onClickBtnClose}>
+              {messages.cancel || "Annuler"}
+            </Button>
+            <Button color="primary" onClick={handleConfirmAction}>
+              {messages.save || "Enregistrer"}
+            </Button>
+          </>
+        );
+      case 'DELETE':
+        return (
+          <>
+            <Button color="secondary" onClick={onClickBtnClose}>
+              {messages.cancel || "Annuler"}
+            </Button>
+            <Button color="danger" onClick={handleConfirmAction}>
+              {messages.delete || "Supprimer"}
+            </Button>
+          </>
+        );
+      case 'CONSULT':
+        return (
+          <Button color="secondary" onClick={onClickBtnClose}>
+            {messages.close || "Fermer"}
+          </Button>
+        );
+      default:
+        return null;
+    }
+  };
+
+  // Fonction pour rendre les champs en lecture seule en mode CONSULT ou DELETE
+  const isReadOnly = modeAside === 'CONSULT' || modeAside === 'DELETE';
+
+  return (
+    <>
+      <Modal
+        isOpen={isOpen}
+        toggle={onClickBtnClose}
+        className="modal-demande"
+        style={{ direction: direction }}
+        size="lg"
+      >
+        <ModalHeader toggle={onClickBtnClose}>
+          {getModalTitle()}
+        </ModalHeader>
+        <ModalBody>
+          <Form>
+            {/* Afficher l'ID uniquement en mode EDIT, DELETE ou CONSULT */}
+            {modeAside !== 'ADD' && (
+              <FormGroup>
+                <Label for="idDemande">ID</Label>
+                <Input
+                  type="text"
+                  name="idDemande"
+                  id="idDemande"
+                  value={formData.idDemande || ''}
+                  readOnly
+                  disabled
+                />
+              </FormGroup>
+            )}
+
+            <FormGroup>
+              <Label for="description">{messages.description || "Description"} *</Label>
+              <Input
+                type="textarea"
+                name="description"
+                id="description"
+                rows="3"
+                value={formData.description || ''}
+                onChange={handleChange}
+                readOnly={isReadOnly}
+                required
+              />
+            </FormGroup>
+
+            <div className="row">
+              <div className="col-md-6">
+                <FormGroup>
+                  <Label for="dateCreation">{messages.dateCreation || "Date de création"}</Label>
+                  <Input
+                    type="date"
+                    name="dateCreation"
+                    id="dateCreation"
+                    value={formData.dateCreation ? new Date(formData.dateCreation).toISOString().split('T')[0] : ''}
+                    onChange={handleChange}
+                    readOnly={true}
+                    disabled={true}
+                  />
+                </FormGroup>
+              </div>
+              <div className="col-md-6">
+                <FormGroup>
+                  <Label for="dateEcheance">{messages.dateEcheance || "Date d'échéance"}</Label>
+                  <Input
+                    type="date"
+                    name="dateEcheance"
+                    id="dateEcheance"
+                    value={formData.dateEcheance ? new Date(formData.dateEcheance).toISOString().split('T')[0] : ''}
+                    onChange={handleChange}
+                    readOnly={isReadOnly}
+                  />
+                </FormGroup>
+              </div>
+            </div>
+
+            <div className="row">
+              <div className="col-md-6">
+                <FormGroup>
+                  <Label for="etat">{messages.etat || "État"}</Label>
+                  <SelectBox
+                    dataSource={Object.keys(ETATS_DEMANDE).map(key => ({
+                      id: ETATS_DEMANDE[key],
+                      text: key
+                    }))}
+                    displayExpr="text"
+                    valueExpr="id"
+                    value={formData.etat}
+                    onValueChanged={e => handleSelectChange('etat', e.value)}
+                    disabled={isReadOnly}
+                  />
+                </FormGroup>
+              </div>
+              <div className="col-md-6">
+                <FormGroup>
+                  <Label for="priorite">{messages.priorite || "Priorité"}</Label>
+                  <SelectBox
+                    dataSource={Object.keys(PRIORITES_DEMANDE).map(key => ({
+                      id: PRIORITES_DEMANDE[key],
+                      text: key
+                    }))}
+                    displayExpr="text"
+                    valueExpr="id"
+                    value={formData.priorite}
+                    onValueChanged={e => handleSelectChange('priorite', e.value)}
+                    disabled={isReadOnly}
+                  />
+                </FormGroup>
+              </div>
+            </div>
+
+            <FormGroup>
+              <Label for="commentaire">{messages.commentaire || "Commentaire"}</Label>
+              <Input
+                type="textarea"
+                name="commentaire"
+                id="commentaire"
+                rows="3"
+                value={formData.commentaire || ''}
+                onChange={handleChange}
+                readOnly={isReadOnly}
+              />
+            </FormGroup>
+
+            <div className="row">
+              <div className="col-md-6">
+                <FormGroup>
+                  <Label for="client">{messages.client || "Client"}</Label>
+                  <SelectBox
+                    dataSource={allClient || []}
+                    displayExpr="nom"
+                    valueExpr="idClient"
+                    value={formData.client ? formData.client.idClient : null}
+                    onValueChanged={e => {
+                      const selectedClient = allClient.find(c => c.idClient === e.value);
+                      handleSelectChange('client', selectedClient);
+                    }}
+                    disabled={isReadOnly}
+                    placeholder={messages.selectClient || "Sélectionner un client"}
+                  />
+                </FormGroup>
+              </div>
+              <div className="col-md-6">
+                <FormGroup>
+                  <Label for="module">{messages.module || "Module"}</Label>
+                  <SelectBox
+                    dataSource={allModule || []}
+                    displayExpr="designation"
+                    valueExpr="idModule"
+                    value={formData.module ? formData.module.idModule : null}
+                    onValueChanged={e => {
+                      const selectedModule = allModule.find(m => m.idModule === e.value);
+                      handleSelectChange('module', selectedModule);
+                    }}
+                    disabled={isReadOnly}
+                    placeholder={messages.selectModule || "Sélectionner un module"}
+                  />
+                </FormGroup>
+              </div>
+            </div>
+
+            <div className="row">
+              <div className="col-md-6">
+                <FormGroup>
+                  <Label for="equipe">{messages.equipe || "Équipe"}</Label>
+                  <SelectBox
+                    dataSource={allEquipe || []}
+                    displayExpr="designation"
+                    valueExpr="idEquipe"
+                    value={formData.equipe ? formData.equipe.idEquipe : null}
+                    onValueChanged={e => {
+                      const selectedEquipe = allEquipe.find(eq => eq.idEquipe === e.value);
+                      handleSelectChange('equipe', selectedEquipe);
+                    }}
+                    disabled={isReadOnly}
+                  />
+                </FormGroup>
+              </div>
+              <div className="col-md-6">
+                <FormGroup>
+                  <Label for="collaborateur">{messages.collaborateur || "Collaborateur"}</Label>
+                  <SelectBox
+                    dataSource={allCollaborateur || []}
+                    displayExpr={item => item ? `${item.prenom} ${item.nom}` : ''}
+                    valueExpr="username"
+                    value={formData.collaborateur ? formData.collaborateur.username : null}
+                    onValueChanged={e => {
+                      const selectedCollaborateur = allCollaborateur.find(c => c.username === e.value);
+                      handleSelectChange('collaborateur', selectedCollaborateur);
+                    }}
+                    disabled={isReadOnly}
+                  />
+                </FormGroup>
+              </div>
+            </div>
+          </Form>
+        </ModalBody>
+        <ModalFooter>
+          {renderFooterButtons()}
+        </ModalFooter>
+      </Modal>
+
+      {/* Modal de confirmation */}
+      <Modal
+        isOpen={isOpenModalConfirmation}
+        toggle={() => dispatch(handleCloseModalConfirmation())}
+        className="modal-confirmation"
+      >
+        <ModalHeader toggle={() => dispatch(handleCloseModalConfirmation())}>
+          {messages.confirmation || "Confirmation"}
+        </ModalHeader>
+        <ModalBody>
+          {messageToShow}
+        </ModalBody>
+        <ModalFooter>
+          <Button
+            color="secondary"
+            onClick={() => {
+              if (actionBtnModalConfirmation && typeof actionBtnModalConfirmation.handleBtnCancelModalConfirmation === "function") {
+                actionBtnModalConfirmation.handleBtnCancelModalConfirmation();
+              } else {
+                dispatch(handleCloseModalConfirmation());
+              }
+            }}
+          >
+            {messages.cancel || "Annuler"}
+          </Button>
+          <Button
+            color={modeAside === "DELETE" ? "danger" : "primary"}
+            onClick={() => {
+              if (actionBtnModalConfirmation && typeof actionBtnModalConfirmation.handleBtnConfirmerModalConfirmation === "function") {
+                actionBtnModalConfirmation.handleBtnConfirmerModalConfirmation();
+              } else {
+                dispatch(handleCloseModalConfirmation());
+              }
+            }}
+          >
+            {messages.confirm || "Confirmer"}
+          </Button>
+        </ModalFooter>
+      </Modal>
+    </>
+  );
+};
+
+export default DemandeAside;

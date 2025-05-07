@@ -77,7 +77,14 @@ const TableGrid = (obj) => {
             <HeaderFilter visible={true} />
             <Sorting mode={'single'} />
             <GroupPanel visible={true} />
-            <SearchPanel visible={true} placeholder={messages.search} />
+            {/* <SearchPanel visible={true} placeholder={""} /> */}
+            <SearchPanel
+  visible={true}
+  placeholder="Rechercher..."
+  width={300}
+/>
+
+
             <Grouping autoExpandAll={false} />
             <Paging defaultPageSize={13} />
             <ColumnChooser enabled={true} />

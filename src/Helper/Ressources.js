@@ -12,7 +12,8 @@ const module = {
         postes: "postes",
         utilisateurs: "users",
         modules: "modules",  
-        clients: 'clients'
+        clients: 'clients',
+        demandes: 'demandes',
     }
 };
 

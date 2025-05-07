@@ -148,30 +148,6 @@ const UtilisateurGrid = () => {
         }
     }
     
-    // const onClickBtnEdit = () => {
-    //     if (dataGrid.current !== null) {
-    //         let dataGridInstance = dataGrid.current.instance;
-    //         let selectedRowKeys = dataGridInstance.getSelectedRowKeys()[0];
-            
-    //         if (!selectedRowKeys) {
-    //             notify(messages.selectUserToEdit || "Veuillez sélectionner un utilisateur à modifier", "warning", notifyOptions);
-    //             return;
-    //         }
-            
-    //         dispatch(getUtilisateurByCode(selectedRowKeys))
-    //             .then((data) => {
-    //                 dispatch(handleOpenEditMode(data, refreshDataGrid));
-    //             })
-    //             .catch(error => {
-    //                 notify(messages.errorFetchingUser || "Erreur lors de la récupération des détails de l'utilisateur", "error", notifyOptions);
-    //                 console.error("Erreur:", error);
-    //                 // S'assurer que le chargement est terminé même en cas d'erreur
-    //                 if (dataGridInstance) {
-    //                     dataGridInstance.endCustomLoading();
-    //                 }
-    //             });
-    //     }
-    // }
     
     const onClickBtnRefresh = () => {
         refreshDataGrid();

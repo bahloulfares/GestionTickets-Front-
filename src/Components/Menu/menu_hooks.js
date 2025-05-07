@@ -12,6 +12,7 @@ import ModulePage from '../Module/ModulePage'
 import ClientPage from '../Client/ClientPage';
 import { Role } from '../../Helper/Enums/Role';
 import EquipePage from '../Equipe/EquipePage'
+import DemandePage from '../Demande/DemandePage'
 
 const Menu_Hooks = () => {
   const dispatch = useDispatch()
@@ -107,7 +108,7 @@ const Menu_Hooks = () => {
             key: `${submenu.codMnP}`,
             title: title,
             icon: <i className={submenu.logo} />,
-            component: <div>Demandes Page (Component not yet implemented)</div>,
+            component: <DemandePage/>,
           }))
           break;
         case 'AllEquipes':
@@ -132,7 +133,6 @@ const Menu_Hooks = () => {
     }
     
     // Pour les autres utilisateurs, n'afficher que les menus de demandes
-    // Vérifier si le menu est lié aux demandes (par exemple, codMnP commence par "04")
     return menu.codMnP.startsWith('04') || 
            menu.desMenuP.toLowerCase().includes('demande') ||
            (menu.mnName && menu.mnName.toLowerCase().includes('demande'));
