@@ -18,7 +18,7 @@ import HelperGrid from '../../Helper/HelperGrid';
 import TableGrid from '../ComponentHelper/TableGrid';
 import { getEtatLabel, getPrioriteLabel } from '../../Helper/Enums/Demande';
 import Ressources from '../../Helper/Ressources';
-import Helper from '../../Helper/Helper';
+//import Helper from '../../Helper/Helper';
 
 // Chargement des messages de localisation
 loadMessages(arMessages);
@@ -85,6 +85,10 @@ const DemandeGrid = () => {
                 visible: true,
                 action: onClickBtnEdit
             },
+            affecte: { // Ajout du bouton Affecté
+                visible: true,
+                action: onClickBtnAffecte
+            },
             consult: {
                 visible: true,
                 action: onClickBtnConsult
@@ -139,6 +143,18 @@ const DemandeGrid = () => {
                 console.error("Erreur:", error);
             });
     }, [dispatch, messages, refreshDataGrid]);
+
+    const onClickBtnAffecte = useCallback(() => {
+        if (!dataGrid.current) return;
+        const dataGridInstance = dataGrid.current.instance;
+        const selectedRowKeys = dataGridInstance.getSelectedRowKeys()[0];
+        if (!selectedRowKeys) {
+            notify("Veuillez sélectionner une demande à affecter", "warning", notifyOptions);
+            return;
+        }
+        // Ici, ouvrez une modal ou effectuez l'action d'affectation souhaitée
+        notify("Action Affecté sur la demande ID: " + selectedRowKeys, "info", notifyOptions);
+    }, []);
     
     // Fonction pour consulter une demande
     const onClickBtnConsult = useCallback(() => {

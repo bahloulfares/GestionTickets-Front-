@@ -159,6 +159,22 @@ const HelperGrid = {
                 }
             },
             {
+                widget: 'dxButton',
+                location: "after",
+                visible: buttons.affecte !== undefined && buttons.affecte.visible,
+                options: {
+                    icon: 'edit',
+                    text: messages.affecte || "Affecté",
+                    disabled: disableButtons,
+                    onInitialized: (args) => {
+                        if (Reducer !== undefined) Reducer.btnAffecteInstance = args.component;
+                    },
+                    onClick: () => {
+                        buttons.affecte.action();
+                    }
+                }
+            },
+            {
                 location: "after",
                 widget: 'dxDropDownButton',
                 options: {
@@ -240,6 +256,8 @@ const HelperGrid = {
                 Reducer.btnDeleteInstance.option('disabled', disableButtons);
             if (Reducer.btnEditionInstance !== undefined)
                 Reducer.btnEditionInstance.option('disabled', disableButtons);
+            if (Reducer.btnAffecteInstance !== undefined)
+                Reducer.btnAffecteInstance.option('disabled', disableButtons);
         } else {
             Reducer.btnConsultInstance.option('disabled', !disableButtons);
             Reducer.btnEditInstance.option('disabled', !disableButtons);
@@ -248,6 +266,8 @@ const HelperGrid = {
                 Reducer.btnDeleteInstance.option('disabled', !disableButtons);
             if (Reducer.btnEditionInstance !== undefined)
                 Reducer.btnEditionInstance.option('disabled', !disableButtons);
+            if (Reducer.btnAffecteInstance !== undefined)
+                Reducer.btnAffecteInstance.option('disabled', !disableButtons);
         }
     },
    /* constructCustomStore: function (url, filtres, Reducer, store, dataGrid, params, keyExpr = 'code') {

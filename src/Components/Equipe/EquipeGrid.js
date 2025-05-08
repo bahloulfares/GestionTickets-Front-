@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from "react-redux";
-import Ressources from "../../Helper/Ressources";
+//import Ressources from "../../Helper/Ressources";
 import {
     handleOpenAddMode,
     handleOpenEditMode,
@@ -17,7 +17,7 @@ import arMessages from "../../i18n/datagrid_ar.json";
 import enMessages from "devextreme/localization/messages/en";
 import frMessages from "devextreme/localization/messages/fr";
 import { getAllEquipes, getEquipeByCode } from "../../Redux/Actions/Equipe/Equipe";
-import Helper from '../../Helper/Helper';
+//import Helper from '../../Helper/Helper';
 import HelperGrid from '../../Helper/HelperGrid';
 import TableGrid from '../ComponentHelper/TableGrid';
 
@@ -165,9 +165,9 @@ const EquipeGrid = () => {
     };
 
     // Fonction pour afficher l'état actif/inactif
-    const formatActif = (data) => {
-        return data.actif ? messages.actif || 'Actif' : messages.inactif || 'Inactif';
-    };
+    // const formatActif = (data) => {
+    //     return data.actif ? messages.actif || 'Actif' : messages.inactif || 'Inactif';
+    // };
 
     // Configuration des colonnes pour le tableau
     const columns = [
