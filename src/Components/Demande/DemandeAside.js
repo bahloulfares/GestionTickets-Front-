@@ -257,28 +257,67 @@ const DemandeAside = () => {
     }
   };
 
-  const handleConfirmAction = () => {
-    if (modeAside === 'DELETE') {
-      // Pour le mode DELETE, afficher une confirmation avant de soumettre
+  // Fonction de confirmation centralisée, similaire à EquipeAside
+  const handleConfirmation = () => {
+    const message =
+      modeAside === "DELETE"
+        ? messages.confirmDeleteDemande || "Êtes-vous sûr de vouloir supprimer cette demande ?"
+        : messages.confirmSaveDemande || "Voulez-vous enregistrer les modifications ?";
+  
+    if (modeAside === "DELETE") {
       const handleBtnConfirmerModalConfirmation = () => {
         dispatch(handleCloseModalConfirmation());
-        handleSubmit();
+        dispatch(deleteDemande(formData.idDemande))
+          .then(() => {
+            notify(
+              messages?.demandeDeleteSuccess || "Demande supprimée avec succès",
+              "success",
+              notifyOptions
+            );
+            dispatch(handleClose());
+            if (successCallback && typeof successCallback === "function") {
+              setTimeout(() => {
+                successCallback();
+              }, 100);
+            }
+          })
+          .catch((error) => {
+            console.error("Erreur suppression demande:", error);
+            notify(
+              error.message || "Erreur lors de la suppression",
+              "error",
+              notifyOptions
+            );
+          });
       };
-      
+  
       const handleBtnCancelModalConfirmation = () => {
         dispatch(handleCloseModalConfirmation());
       };
-      
-      const confirmMessage = messages.confirmDeleteDemande || "Êtes-vous sûr de vouloir supprimer cette demande ?";
-      
-      dispatch(handleOpenModalConfirmation(
-        confirmMessage,
-        handleBtnCancelModalConfirmation,
-        handleBtnConfirmerModalConfirmation
-      ));
+  
+      // Ouvrir le modal de confirmation
+      dispatch(
+        handleOpenModalConfirmation(
+          message,
+          handleBtnCancelModalConfirmation,
+          handleBtnConfirmerModalConfirmation
+        )
+      );
     } else {
-      // Pour les modes ADD et EDIT, soumettre directement sans confirmation
+      // Pour les modes ADD et EDIT, on utilise handleSubmit directement
       handleSubmit();
+    }
+  };
+
+  // Action de confirmation appelée par le bouton "Confirmer" du modal
+  const handleConfirmAction = () => {
+    if (
+      actionBtnModalConfirmation &&
+      typeof actionBtnModalConfirmation.handleBtnConfirmerModalConfirmation === "function"
+    ) {
+      actionBtnModalConfirmation.handleBtnConfirmerModalConfirmation();
+    } else {
+      dispatch(handleCloseModalConfirmation());
     }
   };
 
@@ -290,7 +329,7 @@ const DemandeAside = () => {
             <Button color="secondary" onClick={onClickBtnClose}>
               {messages.cancel || "Annuler"}
             </Button>
-            <Button color="primary" onClick={handleConfirmAction}>
+            <Button color="primary" onClick={handleConfirmation}>
               {messages.add || "Ajouter"}
             </Button>
           </>
@@ -301,7 +340,7 @@ const DemandeAside = () => {
             <Button color="secondary" onClick={onClickBtnClose}>
               {messages.cancel || "Annuler"}
             </Button>
-            <Button color="primary" onClick={handleConfirmAction}>
+            <Button color="primary" onClick={handleConfirmation}>
               {messages.save || "Enregistrer"}
             </Button>
           </>
@@ -312,7 +351,7 @@ const DemandeAside = () => {
             <Button color="secondary" onClick={onClickBtnClose}>
               {messages.cancel || "Annuler"}
             </Button>
-            <Button color="danger" onClick={handleConfirmAction}>
+            <Button color="danger" onClick={handleConfirmation}>
               {messages.delete || "Supprimer"}
             </Button>
           </>
@@ -534,37 +573,21 @@ const DemandeAside = () => {
       <Modal
         isOpen={isOpenModalConfirmation}
         toggle={() => dispatch(handleCloseModalConfirmation())}
-        className="modal-confirmation"
+        className="modal-dialog-centered"
+        size="sm"
       >
         <ModalHeader toggle={() => dispatch(handleCloseModalConfirmation())}>
           {messages.confirmation || "Confirmation"}
         </ModalHeader>
-        <ModalBody>
-          {messageToShow}
-        </ModalBody>
+        <ModalBody>{messageToShow}</ModalBody>
         <ModalFooter>
           <Button
             color="secondary"
-            onClick={() => {
-              if (actionBtnModalConfirmation && typeof actionBtnModalConfirmation.handleBtnCancelModalConfirmation === "function") {
-                actionBtnModalConfirmation.handleBtnCancelModalConfirmation();
-              } else {
-                dispatch(handleCloseModalConfirmation());
-              }
-            }}
+            onClick={() => dispatch(handleCloseModalConfirmation())}
           >
             {messages.cancel || "Annuler"}
           </Button>
-          <Button
-            color={modeAside === "DELETE" ? "danger" : "primary"}
-            onClick={() => {
-              if (actionBtnModalConfirmation && typeof actionBtnModalConfirmation.handleBtnConfirmerModalConfirmation === "function") {
-                actionBtnModalConfirmation.handleBtnConfirmerModalConfirmation();
-              } else {
-                dispatch(handleCloseModalConfirmation());
-              }
-            }}
-          >
+          <Button color="primary" onClick={handleConfirmAction}>
             {messages.confirm || "Confirmer"}
           </Button>
         </ModalFooter>

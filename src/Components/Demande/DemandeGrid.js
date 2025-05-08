@@ -248,13 +248,13 @@ const DemandeGrid = () => {
                     customizeText: renderDateFormat,
                     width: 120
                 },
-                { 
-                    dataField: 'dateEcheance', 
-                    caption: messages.dateEcheance || "Date d'échéance",
-                    dataType: 'date',
-                    customizeText: renderDateFormat,
-                    width: 120
-                },
+                // { 
+                //     dataField: 'dateEcheance', 
+                //     caption: messages.dateEcheance || "Date d'échéance",
+                //     dataType: 'date',
+                //     customizeText: renderDateFormat,
+                //     width: 120
+                // },
                 { 
                     dataField: 'etat', 
                     caption: messages.etat || "État",
@@ -279,18 +279,18 @@ const DemandeGrid = () => {
                     calculateCellValue: data => data.module ? data.module.designation : '',
                     width: 120
                 },
-                { 
-                    dataField: 'equipe', 
-                    caption: messages.equipe || "Équipe",
-                    calculateCellValue: data => data.equipe ? data.equipe.designation : '',
-                    width: 120
-                },
-                { 
-                    dataField: 'collaborateur', 
-                    caption: messages.collaborateur || "Collaborateur",
-                    calculateCellValue: data => data.collaborateur ? `${data.collaborateur.prenom || ''} ${data.collaborateur.nom || ''}`.trim() : '',
-                    width: 150
-                },
+                // { 
+                //     dataField: 'equipe', 
+                //     caption: messages.equipe || "Équipe",
+                //     calculateCellValue: data => data.equipe ? data.equipe.designation : '',
+                //     width: 120
+                // },
+                // { 
+                //     dataField: 'collaborateur', 
+                //     caption: messages.collaborateur || "Collaborateur",
+                //     calculateCellValue: data => data.collaborateur ? `${data.collaborateur.prenom || ''} ${data.collaborateur.nom || ''}`.trim() : '',
+                //     width: 150
+                // },
                 { 
                     dataField: 'createur', 
                     caption: messages.createur || "Créateur",
