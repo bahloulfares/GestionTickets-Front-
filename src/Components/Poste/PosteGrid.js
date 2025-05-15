@@ -230,8 +230,8 @@ const PosteGrid = () => {
                 {
                     dataField: 'idPoste',
                     caption: "ID",
-                    width: 80,
-                    alignment: 'center',
+                    //width: 80,
+                    alignment: 'left',
                     allowSorting: true,
                     sortIndex: 0,
                     sortOrder: 'asc'
@@ -239,32 +239,17 @@ const PosteGrid = () => {
                 {
                     dataField: 'designation',
                     caption: "Désignation",
-                    width: 250,
+                    //width: 250,
                     allowFiltering: true,
                     allowSorting: true
                 },
-                // {
-                //     dataField: 'dateCreation',
-                //     caption: "Date création",
-                //     customizeText: renderDateFormat,
-                //     width: 120,
-                //     allowSorting: true,
-                //     visible: true
-                // },
-                // {
-                //     dataField: 'userCreation',
-                //     caption: "Utilisateur création",
-                //     width: 150,
-                //     allowFiltering: true,
-                //     visible: true
-                // }, 
                 { 
                     dataField: 'actif', 
                     caption: messages.Active || "Active",
                     dataType: 'boolean',
                     allowSorting: true,
                     allowFiltering: true,
-                    width: 80,
+                    //width: 80,
                     cellTemplate: (container, options) => {
                         const div = document.createElement('div');
                         div.className = 'text-center';

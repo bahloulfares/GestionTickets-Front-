@@ -183,8 +183,48 @@ const EquipeAside = () => {
           actionPromise = dispatch(editEquipe(dataToSubmit));
           break;
         case "DELETE":
-          actionPromise = dispatch(deleteEquipe(dataToSubmit.idEquipe));
-          break;
+          // Utiliser la modale de confirmation pour la suppression
+          const handleBtnConfirmerModalConfirmation = () => {
+            dispatch(handleCloseModalConfirmation());
+            dispatch(deleteEquipe(dataToSubmit.idEquipe))
+              .then(() => {
+                notify(
+                  messages?.equipeDeleted || "Équipe supprimée avec succès",
+                  "success",
+                  notifyOptions
+                );
+                dispatch(handleClose());
+                if (successCallback) {
+                  successCallback();
+                }
+              })
+              .catch((error) => {
+                notify(
+                  messages?.errorDelete || "Erreur lors de la suppression de l'équipe",
+                  "error",
+                  notifyOptions
+                );
+                console.error("Erreur suppression équipe:", error);
+              });
+          };
+          
+          const handleBtnCancelModalConfirmation = () => {
+            dispatch(handleCloseModalConfirmation());
+          };
+          
+          dispatch(handleOpenModalConfirmation(
+            messages?.confirmDeleteEquipe || "Êtes-vous sûr de vouloir supprimer cette équipe ?",
+            handleBtnCancelModalConfirmation,
+            handleBtnConfirmerModalConfirmation
+          ));
+          
+          // Réinitialiser l'état du bouton
+          if (btnSubmit) {
+            btnSubmit.disabled = false;
+            btnSubmit.innerHTML = messages?.delete || "Supprimer";
+          }
+          return; // Sortir de la fonction pour éviter l'exécution du reste du code
+          
         default:
           console.error("Mode non reconnu:", modeAside);
           return;
@@ -264,15 +304,40 @@ const EquipeAside = () => {
   const getTitle = () => {
     switch (modeAside) {
       case "ADD":
-        return messages.addEquipe || "Ajouter une équipe";
+        return (
+          <>
+            <i className="fas fa-users-cog mr-2 text-success"></i>
+            {messages.addEquipe || "Ajouter une équipe"}
+          </>
+        );
       case "EDIT":
-        return messages.editEquipe || "Modifier l'équipe";
+        return (
+          <>
+            <i className="fas fa-edit mr-2 text-primary"></i>
+            {messages.editEquipe || "Modifier l'équipe"}
+          </>
+        );
       case "DELETE":
-        return messages.deleteEquipe || "Supprimer l'équipe";
+        return (
+          <>
+            <i className="fas fa-trash-alt mr-2 text-danger"></i>
+            {messages.deleteEquipe || "Supprimer l'équipe"}
+          </>
+        );
       case "CONSULT":
-        return messages.consultEquipe || "Consulter l'équipe";
+        return (
+          <>
+            <i className="fas fa-eye mr-2 text-secondary"></i>
+            {messages.consultEquipe || "Consulter l'équipe"}
+          </>
+        );
       default:
-        return messages.equipe || "Équipe";
+        return (
+          <>
+            <i className="fas fa-users mr-2 text-info"></i>
+            {messages.equipe || "Équipe"}
+          </>
+        );
     }
   };
 
@@ -282,10 +347,12 @@ const EquipeAside = () => {
       case "EDIT":
         return (
           <>
-            <Button color="secondary" onClick={onClickBtnClose}>
+            <Button color="secondary" onClick={onClickBtnClose} className="px-4">
+              <i className="fas fa-times mr-2"></i>
               {messages.cancel || "Annuler"}
             </Button>
-            <Button color="primary" onClick={handleConfirmation}>
+            <Button color="primary" onClick={handleConfirmation} className="px-4">
+              <i className="fas fa-save mr-2"></i>
               {messages.save || "Enregistrer"}
             </Button>
           </>
@@ -293,17 +360,20 @@ const EquipeAside = () => {
       case "DELETE":
         return (
           <>
-            <Button color="secondary" onClick={onClickBtnClose}>
+            <Button color="secondary" onClick={onClickBtnClose} className="px-4">
+              <i className="fas fa-times mr-2"></i>
               {messages.cancel || "Annuler"}
             </Button>
-            <Button color="danger" onClick={handleConfirmation}>
+            <Button color="danger" onClick={handleConfirmation} className="px-4">
+              <i className="fas fa-trash-alt mr-2"></i>
               {messages.delete || "Supprimer"}
             </Button>
           </>
         );
       case "CONSULT":
         return (
-          <Button color="secondary" onClick={onClickBtnClose}>
+          <Button color="secondary" onClick={onClickBtnClose} className="px-4">
+            <i className="fas fa-times mr-2"></i>
             {messages.close || "Fermer"}
           </Button>
         );
@@ -376,13 +446,11 @@ const EquipeAside = () => {
 
   // Ajouter cette fonction pour gérer l'action de confirmation
   const handleConfirmAction = () => {
-    if (
-      actionBtnModalConfirmation &&
-      typeof actionBtnModalConfirmation.handleBtnConfirmerModalConfirmation ===
-        "function"
-    ) {
+    if (actionBtnModalConfirmation && 
+        typeof actionBtnModalConfirmation.handleBtnConfirmerModalConfirmation === "function") {
       actionBtnModalConfirmation.handleBtnConfirmerModalConfirmation();
     } else {
+      console.error("La fonction de confirmation n'est pas disponible");
       dispatch(handleCloseModalConfirmation());
     }
   };
@@ -398,9 +466,38 @@ const EquipeAside = () => {
       >
         <ModalHeader toggle={onClickBtnClose}>{getTitle()}</ModalHeader>
         <ModalBody>
+          {modeAside === "DELETE" && (
+            <div className="alert alert-danger mb-4 d-flex align-items-center">
+              <i className="fas fa-exclamation-triangle mr-2"></i>
+              <div>{messages.deleteWarning || "Attention ! Cette action est irréversible. Toutes les données associées à cette équipe seront supprimées."}</div>
+            </div>
+          )}
           <Form>
+            {modeAside !== "ADD" && (
+              <FormGroup row>
+                <Label sm={3} className="d-flex align-items-center">
+                  <i className="fas fa-hashtag mr-2 text-muted"></i>
+                  ID
+                </Label>
+                <div className="col-sm-9">
+                  <Input
+                    type="text"
+                    name="idEquipe"
+                    id="idEquipe"
+                    value={formData.idEquipe || ''}
+                    readOnly
+                    disabled
+                    className="bg-light"
+                  />
+                </div>
+              </FormGroup>
+            )}
+            
             <FormGroup row>
-              <Label sm={3}>{messages.designation || "Désignation"} *</Label>
+              <Label sm={3} className="d-flex align-items-center font-weight-bold">
+                <i className="fas fa-users mr-2 text-primary"></i>
+                {messages.designation || "Désignation"} <span className="text-danger">*</span>
+              </Label>
               <div className="col-sm-9">
                 <Input
                   type="text"
@@ -415,7 +512,10 @@ const EquipeAside = () => {
             </FormGroup>
 
             <FormGroup row>
-              <Label sm={3}>{messages.members || "Membres"}</Label>
+              <Label sm={3} className="d-flex align-items-center font-weight-bold">
+                <i className="fas fa-user-friends mr-2 text-success"></i>
+                {messages.members || "Membres"}
+              </Label>
               <div className="col-sm-9">
                 <TagBox
                   dataSource={allUtilisateurs}
@@ -449,9 +549,13 @@ const EquipeAside = () => {
             </FormGroup>
 
             <FormGroup row>
-              <Label sm={3}>{messages.active || "Actif"}</Label>
+              
+              <Label sm={3} className="d-flex align-items-center font-weight-bold">
+                {/* <i className="fas fa-toggle-on mr-2 text-success"></i> */}
+                {messages.active || "Actif"}
+              </Label>
               <div className="col-sm-9">
-                <div className="form-check">
+                <div className="form-check d-flex align-items-center">
                   <Input
                     type="checkbox"
                     name="actif"
@@ -459,7 +563,11 @@ const EquipeAside = () => {
                     checked={formData.actif}
                     onChange={handleChange}
                     disabled={isReadOnly}
+                    className="mr-2"
                   />
+                  <Label for="actif" check>
+                    {formData.actif ? messages.activeYes || "Oui" : messages.activeNo || "Non"}
+                  </Label>
                 </div>
               </div>
             </FormGroup>
@@ -467,35 +575,42 @@ const EquipeAside = () => {
 
           {/* Ajouter un message d'erreur si le modal de confirmation ne fonctionne pas */}
           {isOpenModalConfirmation && !actionBtnModalConfirmation && (
-            <div className="alert alert-warning mt-3">
-              Problème avec le modal de confirmation.
-              <Button color="link" onClick={handleSubmit} className="p-0 ml-2">
-                Cliquez ici pour continuer
-              </Button>
+            <div className="alert alert-warning mt-3 d-flex align-items-center">
+              <i className="fas fa-exclamation-circle mr-2"></i>
+              <div>
+                Problème avec le modal de confirmation.
+                <Button color="link" onClick={handleSubmit} className="p-0 ml-2">
+                  <i className="fas fa-arrow-right mr-1"></i>
+                  Cliquez ici pour continuer
+                </Button>
+              </div>
             </div>
           )}
         </ModalBody>
         <ModalFooter>{renderFooterButtons()}</ModalFooter>
       </Modal>
+      {/* Ajouter la modale de confirmation */}
       <Modal
         isOpen={isOpenModalConfirmation}
         toggle={() => dispatch(handleCloseModalConfirmation())}
         className="modal-dialog-centered"
         size="sm"
       >
-        <ModalHeader toggle={() => dispatch(handleCloseModalConfirmation())}>
-          {messages.confirmation || "Confirmation"}
+        <ModalHeader toggle={() => dispatch(handleCloseModalConfirmation())} className="bg-warning text-white">
+          <i className="fas fa-question-circle mr-2"></i>
+          {messages?.Confirmation || "Confirmation"}
         </ModalHeader>
-        <ModalBody>{messageToShow}</ModalBody>
+        <ModalBody className="p-4">
+          <p className="mb-0">{messageToShow || "Êtes-vous sûr de vouloir supprimer cette équipe ?"}</p>
+        </ModalBody>
         <ModalFooter>
-          <Button
-            color="secondary"
-            onClick={() => dispatch(handleCloseModalConfirmation())}
-          >
-            {messages.cancel || "Annuler"}
+          <Button color="secondary" onClick={() => dispatch(handleCloseModalConfirmation())} className="px-3">
+            <i className="fas fa-times mr-2"></i>
+            {messages?.Cancel || "Annuler"}
           </Button>
-          <Button color="primary" onClick={handleConfirmAction}>
-            {messages.confirm || "Confirmer"}
+          <Button color="primary" onClick={handleConfirmAction} className="px-3">
+            <i className="fas fa-check mr-2"></i>
+            {messages?.Confirm || "Confirmer"}
           </Button>
         </ModalFooter>
       </Modal>

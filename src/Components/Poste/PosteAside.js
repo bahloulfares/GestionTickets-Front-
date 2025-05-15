@@ -52,13 +52,33 @@ const PosteAside = () => {
     const getModalTitle = () => {
         switch (PosteAsideReducer.modeAside) {
             case 'ADD':
-                return messages.addPoste || 'Ajouter un poste';
+                return (
+                    <>
+                        <i className="fas fa-plus-circle mr-2 text-success"></i>
+                        {messages.addPoste || 'Ajouter un poste'}
+                    </>
+                );
             case 'EDIT':
-                return messages.editPoste || 'Modifier un poste';
+                return (
+                    <>
+                        <i className="fas fa-edit mr-2 text-primary"></i>
+                        {messages.editPoste || 'Modifier un poste'}
+                    </>
+                );
             case 'DELETE':
-                return messages.deletePoste || 'Supprimer un poste';
+                return (
+                    <>
+                        <i className="fas fa-trash-alt mr-2 text-danger"></i>
+                        {messages.deletePoste || 'Supprimer un poste'}
+                    </>
+                );
             case 'CONSULT':
-                return messages.consultPoste || 'Consulter un poste';
+                return (
+                    <>
+                        <i className="fas fa-eye mr-2 text-secondary"></i>
+                        {messages.consultPoste || 'Consulter un poste'}
+                    </>
+                );
             default:
                 return '';
         }
@@ -141,10 +161,12 @@ const PosteAside = () => {
             case 'ADD':
                 return (
                     <>
-                        <Button color="secondary" onClick={onClickBtnClose}>
+                        <Button color="secondary" onClick={onClickBtnClose} className="px-4">
+                            <i className="fas fa-times mr-2"></i>
                             {messages.cancel || "Annuler"}
                         </Button>
-                        <Button color="primary" onClick={handleSubmit}>
+                        <Button color="success" onClick={handleSubmit} className="px-4">
+                            <i className="fas fa-plus-circle mr-2"></i>
                             {messages.add || "Ajouter"}
                         </Button>
                     </>
@@ -152,10 +174,12 @@ const PosteAside = () => {
             case 'EDIT':
                 return (
                     <>
-                        <Button color="secondary" onClick={onClickBtnClose}>
+                        <Button color="secondary" onClick={onClickBtnClose} className="px-4">
+                            <i className="fas fa-times mr-2"></i>
                             {messages.cancel || "Annuler"}
                         </Button>
-                        <Button color="primary" onClick={handleSubmit}>
+                        <Button color="primary" onClick={handleSubmit} className="px-4">
+                            <i className="fas fa-save mr-2"></i>
                             {messages.save || "Enregistrer"}
                         </Button>
                     </>
@@ -163,17 +187,20 @@ const PosteAside = () => {
             case 'DELETE':
                 return (
                     <>
-                        <Button color="secondary" onClick={onClickBtnClose}>
+                        <Button color="secondary" onClick={onClickBtnClose} className="px-4">
+                            <i className="fas fa-times mr-2"></i>
                             {messages.cancel || "Annuler"}
                         </Button>
-                        <Button color="danger" onClick={handleSubmit}>
+                        <Button color="danger" onClick={handleSubmit} className="px-4">
+                            <i className="fas fa-trash-alt mr-2"></i>
                             {messages.delete || "Supprimer"}
                         </Button>
                     </>
                 );
             case 'CONSULT':
                 return (
-                    <Button color="secondary" onClick={onClickBtnClose}>
+                    <Button color="secondary" onClick={onClickBtnClose} className="px-4">
+                        <i className="fas fa-times mr-2"></i>
                         {messages.close || "Fermer"}
                     </Button>
                 );
@@ -195,9 +222,35 @@ const PosteAside = () => {
                     {getModalTitle()}
                 </ModalHeader>
                 <ModalBody>
+                    {PosteAsideReducer.modeAside === 'DELETE' && (
+                        <div className="alert alert-danger mb-4 d-flex align-items-center">
+                            <i className="fas fa-exclamation-triangle mr-2"></i>
+                            <div>{messages.deleteWarning || "Attention ! Cette action est irréversible. Toutes les données associées à ce poste seront supprimées."}</div>
+                        </div>
+                    )}
                     <Form onSubmit={handleSubmit}>
+                        {PosteAsideReducer.modeAside !== 'ADD' && (
+                            <FormGroup>
+                                <Label for="idPoste" className="d-flex align-items-center">
+                                    <i className="fas fa-hashtag mr-2 text-muted"></i>
+                                    ID
+                                </Label>
+                                <Input
+                                    type="text"
+                                    name="idPoste"
+                                    id="idPoste"
+                                    value={formData.idPoste || ''}
+                                    readOnly
+                                    disabled
+                                    className="bg-light"
+                                />
+                            </FormGroup>
+                        )}
                         <FormGroup>
-                            <Label for="designation">{messages.designation || "Désignation"}</Label>
+                            <Label for="designation" className="d-flex align-items-center font-weight-bold">
+                                {/* <i className="fas fa-briefcase mr-2 text-primary"></i> */}
+                                {messages.designation || "Désignation"} <span className="text-danger">*</span>
+                            </Label>
                             <Input
                                 type="text"
                                 name="designation"
@@ -209,15 +262,17 @@ const PosteAside = () => {
                             />
                         </FormGroup>
                         
-                        <FormGroup check>
-                            <Label check>
+                        <FormGroup check className="mt-3">
+                            <Label check className="d-flex align-items-center">
                                 <Input
                                     type="checkbox"
                                     name="actif"
                                     checked={formData.actif}
                                     onChange={handleChange}
                                     disabled={PosteAsideReducer.modeAside === 'CONSULT' || PosteAsideReducer.modeAside === 'DELETE'}
+                                    className="mr-2"
                                 />{' '}
+                                {/* <i className="fas fa-toggle-on mr-2 text-success"></i> */}
                                 {messages.active || "Actif"}
                             </Label>
                         </FormGroup>
@@ -235,17 +290,28 @@ const PosteAside = () => {
                 className="modal-dialog-centered"
                 size="sm"
             >
-                <ModalHeader toggle={() => dispatch(handleCloseModalConfirmation())}>
+                <ModalHeader toggle={() => dispatch(handleCloseModalConfirmation())} className="bg-warning text-white">
+                    <i className="fas fa-question-circle mr-2"></i>
                     {messages.confirmation || "Confirmation"}
                 </ModalHeader>
-                <ModalBody>
-                    {messageToShow}
+                <ModalBody className="p-4">
+                    <p className="mb-0">{messageToShow}</p>
                 </ModalBody>
                 <ModalFooter>
-                    <Button color="secondary" onClick={() => dispatch(handleCloseModalConfirmation())}>
+                    <Button 
+                        color="secondary" 
+                        onClick={() => dispatch(handleCloseModalConfirmation())}
+                        className="px-3"
+                    >
+                        <i className="fas fa-times mr-2"></i>
                         {messages.cancel || "Annuler"}
                     </Button>
-                    <Button color="primary" onClick={handleConfirmAction}>
+                    <Button 
+                        color="primary" 
+                        onClick={handleConfirmAction}
+                        className="px-3"
+                    >
+                        <i className="fas fa-check mr-2"></i>
                         {messages.confirm || "Confirmer"}
                     </Button>
                 </ModalFooter>

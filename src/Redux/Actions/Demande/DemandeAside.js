@@ -118,3 +118,57 @@ export const fetchModulesForDemande = () => {
             });
     };
 };
+
+export const fetchEquipesForDemande = () => {
+    return dispatch => {
+        return axios.get(`${Ressources.CoreUrlB}/template-core/api/equipes`)
+            .then(response => {
+                dispatch({
+                    type: 'FETCH_EQUIPES_FOR_DEMANDE_SUCCESS',
+                    payload: response.data
+                });
+                return response.data;
+            })
+            .catch(error => {
+                console.error("Erreur lors de la récupération des équipes:", error);
+                // Dispatch une action d'erreur pour informer l'UI
+                dispatch({
+                    type: 'FETCH_EQUIPES_FOR_DEMANDE_ERROR',
+                    payload: error.message
+                });
+                // Utiliser un tableau vide en cas d'erreur pour éviter les erreurs d'affichage
+                dispatch({
+                    type: 'FETCH_EQUIPES_FOR_DEMANDE_SUCCESS',
+                    payload: []
+                });
+                throw error;
+            });
+    };
+};
+
+export const fetchCollaborateursForDemande = () => {
+    return dispatch => {
+        return axios.get(`${Ressources.CoreUrlB}/template-core/api/users`)
+            .then(response => {
+                dispatch({
+                    type: 'FETCH_COLLABORATEURS_FOR_DEMANDE_SUCCESS',
+                    payload: response.data
+                });
+                return response.data;
+            })
+            .catch(error => {
+                console.error("Erreur lors de la récupération des collaborateurs:", error);
+                // Dispatch une action d'erreur pour informer l'UI
+                dispatch({
+                    type: 'FETCH_COLLABORATEURS_FOR_DEMANDE_ERROR',
+                    payload: error.message
+                });
+                // Utiliser un tableau vide en cas d'erreur pour éviter les erreurs d'affichage
+                dispatch({
+                    type: 'FETCH_COLLABORATEURS_FOR_DEMANDE_SUCCESS',
+                    payload: []
+                });
+                throw error;
+            });
+    };
+};

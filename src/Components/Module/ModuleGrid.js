@@ -183,7 +183,8 @@ const ModuleGrid = () => {
             onRowClick={onRowClick}
             fileName={messages.Modules}
             columns={[
-                { dataField: 'idModule', caption: "ID" },
+                { dataField: 'idModule', caption: "ID",alignment: 'left',
+                },
                 { dataField: 'designation', caption: "Nom" },
                 { 
                     dataField: 'actif', 
@@ -191,7 +192,7 @@ const ModuleGrid = () => {
                     dataType: 'boolean',
                     allowSorting: true,
                     allowFiltering: true,
-                    width: 80,
+                    //width: 80,
                     cellTemplate: (container, options) => {
                         const div = document.createElement('div');
                         div.className = 'text-center';

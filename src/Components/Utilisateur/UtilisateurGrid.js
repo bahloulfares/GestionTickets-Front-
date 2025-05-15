@@ -179,7 +179,8 @@ const UtilisateurGrid = () => {
                     dataType: 'string',
                     allowSorting: true,
                     allowFiltering: true,
-                    width: 150
+                    alignment: 'left',
+                    //width: 150
                 },
                 { 
                     dataField: 'nom', 
@@ -187,7 +188,7 @@ const UtilisateurGrid = () => {
                     dataType: 'string',
                     allowSorting: true,
                     allowFiltering: true,
-                    width: 150
+                    //width: 150
                 },
                 { 
                     dataField: 'prenom', 
@@ -195,7 +196,7 @@ const UtilisateurGrid = () => {
                     dataType: 'string',
                     allowSorting: true,
                     allowFiltering: true,
-                    width: 150
+                    //width: 150
                 },
                 { 
                     dataField: 'role', 
@@ -204,7 +205,7 @@ const UtilisateurGrid = () => {
                     allowSorting: true,
                     allowFiltering: true,
                     calculateCellValue: (data) => getRoleLabel(data.role),
-                    width: 120
+                    //width: 120
                 },
                 { 
                     dataField: 'id_poste', 
@@ -212,7 +213,7 @@ const UtilisateurGrid = () => {
                     dataType: 'string',
                     allowSorting: true,
                     allowFiltering: true,
-                    width: 150,
+                    //width: 150,
                     calculateCellValue: (rowData) => {
                         console.log('Position data for user:', rowData.username, rowData);
                         
@@ -251,7 +252,7 @@ const UtilisateurGrid = () => {
                     dataType: 'boolean',
                     allowSorting: true,
                     allowFiltering: true,
-                    width: 80,
+                    //width: 80,
                     cellTemplate: (container, options) => {
                         const div = document.createElement('div');
                         div.className = 'text-center';

@@ -163,15 +163,40 @@ const UtilisateurAside = () => {
   const getTitle = () => {
     switch (modeAside) {
       case "ADD":
-        return messages.addUser || "Ajouter un utilisateur";
+        return (
+          <>
+            <i className="fas fa-user-plus mr-2 text-success"></i>
+            {messages.addUser || "Ajouter un utilisateur"}
+          </>
+        );
       case "EDIT":
-        return messages.editUser || "Modifier un utilisateur";
+        return (
+          <>
+            <i className="fas fa-user-edit mr-2 text-primary"></i>
+            {messages.editUser || "Modifier un utilisateur"}
+          </>
+        );
       case "DELETE":
-        return messages.deleteUser || "Supprimer un utilisateur";
+        return (
+          <>
+            <i className="fas fa-user-times mr-2 text-danger"></i>
+            {messages.deleteUser || "Supprimer un utilisateur"}
+          </>
+        );
       case "CONSULT":
-        return messages.consultUser || "Consulter un utilisateur";
+        return (
+          <>
+            <i className="fas fa-user-check mr-2 text-secondary"></i>
+            {messages.consultUser || "Consulter un utilisateur"}
+          </>
+        );
       default:
-        return messages.user || "Utilisateur";
+        return (
+          <>
+            <i className="fas fa-user mr-2 text-info"></i>
+            {messages.user || "Utilisateur"}
+          </>
+        );
     }
   };
 
@@ -180,10 +205,12 @@ const UtilisateurAside = () => {
       case "ADD":
         return (
           <>
-            <Button color="secondary" onClick={onClickBtnClose}>
+            <Button color="secondary" onClick={onClickBtnClose} className="px-4">
+              <i className="fas fa-times mr-2"></i>
               {messages.cancel || "Annuler"}
             </Button>
-            <Button color="primary" onClick={handleSubmit}>
+            <Button color="success" onClick={handleSubmit} className="px-4">
+              <i className="fas fa-user-plus mr-2"></i>
               {messages.add || "Ajouter"}
             </Button>
           </>
@@ -191,10 +218,12 @@ const UtilisateurAside = () => {
       case "EDIT":
         return (
           <>
-            <Button color="secondary" onClick={onClickBtnClose}>
+            <Button color="secondary" onClick={onClickBtnClose} className="px-4">
+              <i className="fas fa-times mr-2"></i>
               {messages.cancel || "Annuler"}
             </Button>
-            <Button color="primary" onClick={handleSubmit}>
+            <Button color="primary" onClick={handleSubmit} className="px-4">
+              <i className="fas fa-save mr-2"></i>
               {messages.save || "Enregistrer"}
             </Button>
           </>
@@ -202,17 +231,20 @@ const UtilisateurAside = () => {
       case "DELETE":
         return (
           <>
-            <Button color="secondary" onClick={onClickBtnClose}>
+            <Button color="secondary" onClick={onClickBtnClose} className="px-4">
+              <i className="fas fa-times mr-2"></i>
               {messages.cancel || "Annuler"}
             </Button>
-            <Button color="danger" onClick={handleSubmit}>
+            <Button color="danger" onClick={handleSubmit} className="px-4">
+              <i className="fas fa-trash-alt mr-2"></i>
               {messages.delete || "Supprimer"}
             </Button>
           </>
         );
       case "CONSULT":
         return (
-          <Button color="secondary" onClick={onClickBtnClose}>
+          <Button color="secondary" onClick={onClickBtnClose} className="px-4">
+            <i className="fas fa-times mr-2"></i>
             {messages.close || "Fermer"}
           </Button>
         );
@@ -362,11 +394,17 @@ const UtilisateurAside = () => {
       >
         <ModalHeader toggle={onClickBtnClose}>{getTitle()}</ModalHeader>
         <ModalBody>
+        {modeAside === "DELETE" && (
+            <div className="alert alert-danger mb-4 d-flex align-items-center">
+              <i className="fas fa-exclamation-triangle mr-2"></i>
+              <div>{messages.deleteWarning || "Attention ! Cette action est irréversible. Toutes les données associées à cet utilisateur seront supprimées."}</div>
+            </div>
+          )}
         <Form onSubmit={handleSubmit}>
   <div className="row">
     <div className="col-6">
       <FormGroup>
-        <Label for="username">{messages.username || "Nom d'utilisateur"} *</Label>
+        <Label for="username" className="d-flex align-items-center font-weight-bold"> <i className="fas fa-user-tag mr-2 text-primary"></i>{messages.username || "Nom d'utilisateur"} <span className="text-danger">*</span></Label>
         <Input
           type="text"
           name="username"
@@ -380,7 +418,7 @@ const UtilisateurAside = () => {
     </div>
     <div className="col-6">
       <FormGroup>
-        <Label for="password">{messages.password || "Mot de passe"} {modeAside === "ADD" && " *"}</Label>
+        <Label for="password" className="d-flex align-items-center font-weight-bold"><i className="fas fa-lock mr-2 text-danger"></i>{messages.password || "Mot de passe"} {modeAside === "ADD" &&<span className="text-danger">*</span>}</Label>
         <Input
           type="password"
           name="password"
@@ -396,117 +434,132 @@ const UtilisateurAside = () => {
   </div>
 
   <div className="row">
-    <div className="col-6">
-      <FormGroup>
-        <Label for="nom">{messages.nom || "Nom"} *</Label>
-        <Input
-          type="text"
-          name="nom"
-          id="nom"
-          value={formData.nom}
-          onChange={handleChange}
-          disabled={modeAside === "CONSULT" || modeAside === "DELETE"}
-          required
-        />
-      </FormGroup>
-    </div>
-    <div className="col-6">
-      <FormGroup>
-        <Label for="prenom">{messages.prenom || "Prénom"} *</Label>
-        <Input
-          type="text"
-          name="prenom"
-          id="prenom"
-          value={formData.prenom}
-          onChange={handleChange}
-          disabled={modeAside === "CONSULT" || modeAside === "DELETE"}
-          required
-        />
-      </FormGroup>
-    </div>
-  </div>
+              <div className="col-6">
+                <FormGroup>
+                  <Label for="nom" className="d-flex align-items-center font-weight-bold">
+                    <i className="fas fa-user mr-2 text-info"></i>
+                    {messages.nom || "Nom"} <span className="text-danger">*</span>
+                  </Label>
+                  <Input
+                    type="text"
+                    name="nom"
+                    id="nom"
+                    value={formData.nom}
+                    onChange={handleChange}
+                    disabled={modeAside === "CONSULT" || modeAside === "DELETE"}
+                    required
+                  />
+                </FormGroup>
+              </div>
+              <div className="col-6">
+                <FormGroup>
+                  <Label for="prenom" className="d-flex align-items-center font-weight-bold">
+                    <i className="fas fa-user mr-2 text-success"></i>
+                    {messages.prenom || "Prénom"} <span className="text-danger">*</span>
+                  </Label>
+                  <Input
+                    type="text"
+                    name="prenom"
+                    id="prenom"
+                    value={formData.prenom}
+                    onChange={handleChange}
+                    disabled={modeAside === "CONSULT" || modeAside === "DELETE"}
+                    required
+                  />
+                </FormGroup>
+              </div>
+            </div>
 
-  <div className="row">
-    <div className="col-6">
-      <FormGroup>
-        <Label for="description">{messages.description || "Description"}</Label>
-        <Input
-          type="textarea"
-          name="description"
-          id="description"
-          value={formData.description}
-          onChange={handleChange}
-          disabled={modeAside === "CONSULT" || modeAside === "DELETE"}
-        />
-      </FormGroup>
-    </div>
-    <div className="col-6">
-      <FormGroup>
-        <Label for="role">{messages.role || "Rôle"} *</Label>
-        <Input
-          type="select"
-          name="role"
-          id="role"
-          value={formData.role}
-          onChange={handleChange}
-          disabled={modeAside === "CONSULT" || modeAside === "DELETE"}
-          required
-        >
-          {RoleOptions.map((role, index) => (
-            <option key={index} value={role.value}>
-              {messages[role.value] || role.label}
-            </option>
-          ))}
-        </Input>
-      </FormGroup>
-    </div>
-  </div>
+            <div className="row">
+              <div className="col-6">
+                <FormGroup>
+                  <Label for="description" className="d-flex align-items-center font-weight-bold">
+                    <i className="fas fa-align-left mr-2 text-secondary"></i>
+                    {messages.description || "Description"}
+                  </Label>
+                  <Input
+                    type="textarea"
+                    name="description"
+                    id="description"
+                    value={formData.description}
+                    onChange={handleChange}
+                    disabled={modeAside === "CONSULT" || modeAside === "DELETE"}
+                  />
+                </FormGroup>
+              </div>
+              <div className="col-6">
+                <FormGroup>
+                  <Label for="role" className="d-flex align-items-center font-weight-bold">
+                    <i className="fas fa-user-shield mr-2 text-warning"></i>
+                    {messages.role || "Rôle"} <span className="text-danger">*</span>
+                  </Label>
+                  <Input
+                    type="select"
+                    name="role"
+                    id="role"
+                    value={formData.role}
+                    onChange={handleChange}
+                    disabled={modeAside === "CONSULT" || modeAside === "DELETE"}
+                    required
+                  >
+                    {RoleOptions.map((role, index) => (
+                      <option key={index} value={role.value}>
+                        {messages[role.value] || role.label}
+                      </option>
+                    ))}
+                  </Input>
+                </FormGroup>
+              </div>
+            </div>
 
-  {/* Champ de sélection du poste */}
-  <div className="row">
-    <div className="col-6">
-      <FormGroup>
-        <Label for="poste">{messages.poste || "Poste"}</Label>
-        <Input
-          type="select"
-          name="poste"
-          id="poste"
-          value={formData.poste ? formData.poste.idPoste : ""}
-          onChange={(e) => {
-            const selectedPoste = allPoste.find(p => p.idPoste === parseInt(e.target.value));
-            setFormData(prev => ({
-              ...prev,
-              poste: selectedPoste || null,
-            }));
-          }}
-          disabled={modeAside === "CONSULT" || modeAside === "DELETE"}
-        >
-          <option value="">-- Sélectionner un poste --</option>
-          {allPoste.map(poste => (
-            <option key={poste.idPoste} value={poste.idPoste}>
-              {poste.designation}
-            </option>
-          ))}
-        </Input>
-      </FormGroup>
-    </div>
-    <div className="col-6">
-      <FormGroup check>
-        <Label check>
-          <Input
-            type="checkbox"
-            name="actif"
-            checked={formData.actif}
-            onChange={handleChange}
-            disabled={modeAside === "CONSULT" || modeAside === "DELETE"}
-          />
-          {messages.active || "Actif"}
-        </Label>
-      </FormGroup>
-    </div>
-  </div>
-</Form>
-
+            <div className="row">
+              <div className="col-6">
+                <FormGroup>
+                  <Label for="poste" className="d-flex align-items-center font-weight-bold">
+                    <i className="fas fa-briefcase mr-2 text-primary"></i>
+                    {messages.poste || "Poste"}
+                  </Label>
+                  <Input
+                    type="select"
+                    name="poste"
+                    id="poste"
+                    value={formData.poste ? formData.poste.idPoste : ""}
+                    onChange={(e) => {
+                      const selectedPoste = allPoste.find(p => p.idPoste === parseInt(e.target.value));
+                      setFormData(prev => ({
+                        ...prev,
+                        poste: selectedPoste || null,
+                      }));
+                    }}
+                    disabled={modeAside === "CONSULT" || modeAside === "DELETE"}
+                  >
+                    <option value="">-- Sélectionner un poste --</option>
+                    {allPoste.map(poste => (
+                      <option key={poste.idPoste} value={poste.idPoste}>
+                        {poste.designation}
+                      </option>
+                    ))}
+                  </Input>
+                </FormGroup>
+              </div>
+              <div className="col-6">
+                <FormGroup check className="mt-4">
+                  <Label check className="d-flex align-items-center">
+                    <Input
+                      type="checkbox"
+                      name="actif"
+                      checked={formData.actif}
+                      onChange={handleChange}
+                      disabled={modeAside === "CONSULT" || modeAside === "DELETE"}
+                      className="mr-2"
+                    />
+                    {/* <i className="fas fa-toggle-on mr-2 text-success"></i> */}
+                    {messages.active || "Actif"}
+                  </Label>
+                </FormGroup>
+              </div>
+            </div>
+          </Form>
         </ModalBody>
 
         <ModalFooter>{renderFooterButtons()}</ModalFooter>
@@ -515,11 +568,14 @@ const UtilisateurAside = () => {
       <Modal
         isOpen={isOpenModalConfirmation}
         toggle={() => dispatch(handleCloseModalConfirmation())}
+         className="modal-dialog-centered"
+        size="sm"
       >
-        <ModalHeader toggle={() => dispatch(handleCloseModalConfirmation())}>
+        <ModalHeader toggle={() => dispatch(handleCloseModalConfirmation())}className="bg-warning text-white">
+        <i className="fas fa-question-circle mr-2"></i>
           {messages.confirmation || "Confirmation"}
         </ModalHeader>
-        <ModalBody>{messageToShow}</ModalBody>
+        <ModalBody className="p-4"><p className="mb-0">{messageToShow}</p></ModalBody>
         <ModalFooter>
           <Button
             color="secondary"
@@ -534,10 +590,12 @@ const UtilisateurAside = () => {
                 dispatch(handleCloseModalConfirmation());
               }
             }}
-          >
+            className="px-3"
+          ><i className="fas fa-times mr-2"></i>
             {messages.cancel || "Annuler"}
           </Button>
-          <Button color="primary" onClick={handleConfirmAction}>
+          <Button color="primary" onClick={handleConfirmAction} className="px-3">
+          <i className="fas fa-check mr-2"></i>
             {messages.confirm || "Confirmer"}
           </Button>
         </ModalFooter>

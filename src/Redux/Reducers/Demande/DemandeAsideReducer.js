@@ -21,7 +21,9 @@ const initialState = {
     allClient: [],
     allModule: [],
     allEquipe: [],
-    allCollaborateur: []
+    allCollaborateur: [],
+    equipeError: null,
+    collaborateurError: null
 };
 
 const DemandeAsideReducer = (state = initialState, action) => {
@@ -103,10 +105,32 @@ const DemandeAsideReducer = (state = initialState, action) => {
                 ...state,
                 allModule: action.payload
             };
-            // return {
-            //     ...state,
-            //     isOpen: false
-            // };
+            
+        case 'FETCH_EQUIPES_FOR_DEMANDE_SUCCESS':
+            return {
+                ...state,
+                allEquipe: action.payload,
+                equipeError: null
+            };
+            
+        case 'FETCH_EQUIPES_FOR_DEMANDE_ERROR':
+            return {
+                ...state,
+                equipeError: action.payload
+            };
+            
+        case 'FETCH_COLLABORATEURS_FOR_DEMANDE_SUCCESS':
+            return {
+                ...state,
+                allCollaborateur: action.payload,
+                collaborateurError: null
+            };
+            
+        case 'FETCH_COLLABORATEURS_FOR_DEMANDE_ERROR':
+            return {
+                ...state,
+                collaborateurError: action.payload
+            };
 
         default:
             return state;

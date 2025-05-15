@@ -19,6 +19,10 @@ import { ETATS_DEMANDE, PRIORITES_DEMANDE } from '../../Helper/Enums/Demande';
 import SelectBox from 'devextreme-react/select-box';
 import { fetchClientsForDemande, fetchModulesForDemande } from "../../Redux/Actions/Demande/DemandeAside";
 
+// Ajoutez ces imports
+import { fetchEquipesForDemande, fetchCollaborateursForDemande } from "../../Redux/Actions/Demande/DemandeAside";
+import DemandeAssignationModal from './DemandeAssignationModal';
+
 const DemandeAside = () => {
   const dispatch = useDispatch();
   const {
@@ -44,7 +48,7 @@ const DemandeAside = () => {
   const [formData, setFormData] = useState({
     idDemande: null,
     description: '',
-    dateCreation: new Date(),
+    //dateCreation: new Date(),
     dateEcheance: null,
     etat: ETATS_DEMANDE.DEMANDE_CREEE,
     priorite: PRIORITES_DEMANDE.NORMALE,
@@ -53,16 +57,18 @@ const DemandeAside = () => {
     module: null,
     equipe: null,
     collaborateur: null,
-    createur: null // Ajout du champ createur
+    //createur: null // Ajout du champ createur
   });
 
-  // Mettre à jour le formulaire lorsque la demande sélectionnée change
+  // Ajout d'un état pour stocker les collaborateurs filtrés
+  const [filteredCollaborateurs, setFilteredCollaborateurs] = useState([]);
+
   useEffect(() => {
     if (selectedDemande && modeAside !== "ADD") {
       setFormData({
         idDemande: selectedDemande.idDemande || null,
         description: selectedDemande.description || '',
-        dateCreation: selectedDemande.dateCreation || new Date(),
+        //dateCreation: selectedDemande.dateCreation || new Date(),
         dateEcheance: selectedDemande.dateEcheance || null,
         etat: selectedDemande.etat || ETATS_DEMANDE.DEMANDE_CREEE,
         priorite: selectedDemande.priorite || PRIORITES_DEMANDE.NORMALE,
@@ -71,13 +77,13 @@ const DemandeAside = () => {
         module: selectedDemande.module || null,
         equipe: selectedDemande.equipe || null,
         collaborateur: selectedDemande.collaborateur || null,
-        createur: selectedDemande.createur || userAuthentification // Utiliser l'utilisateur connecté si pas de créateur existant
+        //createur: selectedDemande.createur || userAuthentification // Utiliser l'utilisateur connecté si pas de créateur existant
       });
     } else {
       setFormData({
         idDemande: null,
         description: '',
-        dateCreation: new Date(),
+        //dateCreation: new Date(),
         dateEcheance: null,
         etat: ETATS_DEMANDE.DEMANDE_CREEE,
         priorite: PRIORITES_DEMANDE.NORMALE,
@@ -86,17 +92,19 @@ const DemandeAside = () => {
         module: null,
         equipe: null,
         collaborateur: null,
-        createur: userAuthentification // Définir l'utilisateur connecté comme créateur par défaut
+        //createur: userAuthentification // Définir l'utilisateur connecté comme créateur par défaut
       });
     }
   }, [selectedDemande, modeAside, userAuthentification]);
 
-  // Ajoutez ceci dans votre composant, après les autres useEffect
   useEffect(() => {
     if (isOpen) {
       // Charger les clients et les modules lorsque le modal s'ouvre
       dispatch(fetchClientsForDemande());
       dispatch(fetchModulesForDemande());
+      // Ajouter ces lignes pour charger les équipes et collaborateurs
+      dispatch(fetchEquipesForDemande());
+      dispatch(fetchCollaborateursForDemande());
     }
   }, [isOpen, dispatch]);
   
@@ -109,6 +117,33 @@ const DemandeAside = () => {
       [name]: type === 'checkbox' ? checked : value
     });
   };
+
+  // Ajouter cet useEffect pour filtrer les collaborateurs en fonction de l'équipe sélectionnée
+  useEffect(() => {
+    if (formData.equipe && allCollaborateur && allCollaborateur.length > 0) {
+      // Filtrer les collaborateurs qui appartiennent à l'équipe sélectionnée
+      const collaborateursEquipe = allCollaborateur.filter(
+        collaborateur => collaborateur.idEquipe === formData.equipe.idEquipe
+      );
+      setFilteredCollaborateurs(collaborateursEquipe);
+      
+      // Réinitialiser le collaborateur sélectionné si celui-ci n'appartient pas à la nouvelle équipe
+      if (formData.collaborateur) {
+        const collaborateurExisteDansEquipe = collaborateursEquipe.some(
+          c => c.username === formData.collaborateur.username
+        );
+        if (!collaborateurExisteDansEquipe) {
+          setFormData(prev => ({
+            ...prev,
+            collaborateur: null
+          }));
+        }
+      }
+    } else {
+      // Si aucune équipe n'est sélectionnée, afficher tous les collaborateurs
+      setFilteredCollaborateurs(allCollaborateur || []);
+    }
+  }, [formData.equipe, allCollaborateur, formData.collaborateur]);
 
   const handleSelectChange = (fieldName, value) => {
     setFormData(prevData => ({
@@ -162,7 +197,7 @@ const DemandeAside = () => {
     const dataToSubmit = { 
       ...formData,
       // S'assurer que le créateur est toujours inclus dans les données soumises
-      createur: formData.createur || userAuthentification
+      //createur: formData.createur || userAuthentification
     };
 
     try {
@@ -187,6 +222,22 @@ const DemandeAside = () => {
             let messageSuccess = "";
             if (modeAside === "ADD") {
               messageSuccess = messages.demandeAddSuccess || "Demande ajoutée avec succès";
+              
+              // Réinitialiser le formulaire après l'ajout d'une demande
+              setFormData({
+                idDemande: null,
+                description: '',
+               // dateCreation: new Date(),
+                dateEcheance: null,
+                etat: ETATS_DEMANDE.DEMANDE_CREEE,
+                priorite: PRIORITES_DEMANDE.NORMALE,
+                commentaire: '',
+                client: null,
+                module: null,
+                equipe: null,
+                collaborateur: null,
+                //createur: userAuthentification
+              });
             } else if (modeAside === "EDIT") {
               messageSuccess = messages.demandeEditSuccess || "Demande modifiée avec succès";
             } else if (modeAside === "DELETE") {
@@ -221,8 +272,8 @@ const DemandeAside = () => {
             console.error("Erreur:", error);
             
             // Fermer quand même les modales en cas d'erreur
-            dispatch(handleCloseModalConfirmation());
-            dispatch(handleClose());
+            //dispatch(handleCloseModalConfirmation());
+            //dispatch(handleClose());
           })
           .finally(() => {
             // Réactiver le bouton après le traitement
@@ -244,8 +295,8 @@ const DemandeAside = () => {
       notify(messages.unexpectedError || "Une erreur inattendue s'est produite", "error", notifyOptions);
       
       // Fermer quand même les modales en cas d'erreur
-      dispatch(handleCloseModalConfirmation());
-      dispatch(handleClose());
+      //dispatch(handleCloseModalConfirmation());
+      //dispatch(handleClose());
       
       // Réactiver le bouton en cas d'erreur
       if (btnSubmit) {
@@ -326,10 +377,12 @@ const DemandeAside = () => {
       case 'ADD':
         return (
           <>
-            <Button color="secondary" onClick={onClickBtnClose}>
+            <Button color="secondary" onClick={onClickBtnClose} className="px-4">
+              <i className="fas fa-times mr-2"></i>
               {messages.cancel || "Annuler"}
             </Button>
-            <Button color="primary" onClick={handleConfirmation}>
+            <Button color="success" onClick={handleConfirmation} className="px-4">
+              <i className="fas fa-plus-circle mr-2"></i>
               {messages.add || "Ajouter"}
             </Button>
           </>
@@ -337,10 +390,12 @@ const DemandeAside = () => {
       case 'EDIT':
         return (
           <>
-            <Button color="secondary" onClick={onClickBtnClose}>
+            <Button color="secondary" onClick={onClickBtnClose} className="px-4">
+              <i className="fas fa-times mr-2"></i>
               {messages.cancel || "Annuler"}
             </Button>
-            <Button color="primary" onClick={handleConfirmation}>
+            <Button color="primary" onClick={handleConfirmation} className="px-4">
+              <i className="fas fa-save mr-2"></i>
               {messages.save || "Enregistrer"}
             </Button>
           </>
@@ -348,17 +403,20 @@ const DemandeAside = () => {
       case 'DELETE':
         return (
           <>
-            <Button color="secondary" onClick={onClickBtnClose}>
+            <Button color="secondary" onClick={onClickBtnClose} className="px-4">
+              <i className="fas fa-times mr-2"></i>
               {messages.cancel || "Annuler"}
             </Button>
-            <Button color="danger" onClick={handleConfirmation}>
+            <Button color="danger" onClick={handleConfirmation} className="px-4">
+              <i className="fas fa-trash-alt mr-2"></i>
               {messages.delete || "Supprimer"}
             </Button>
           </>
         );
       case 'CONSULT':
         return (
-          <Button color="secondary" onClick={onClickBtnClose}>
+          <Button color="secondary" onClick={onClickBtnClose} className="px-4">
+            <i className="fas fa-times mr-2"></i>
             {messages.close || "Fermer"}
           </Button>
         );
@@ -369,6 +427,9 @@ const DemandeAside = () => {
 
   // Fonction pour rendre les champs en lecture seule en mode CONSULT ou DELETE
   const isReadOnly = modeAside === 'CONSULT' || modeAside === 'DELETE';
+  
+  // Nouvelle fonction pour déterminer si les champs équipe et collaborateur sont en lecture seule
+  const isTeamAndCollabReadOnly = isReadOnly || modeAside === 'ADD' || modeAside === 'EDIT';
 
   return (
     <>
@@ -380,14 +441,28 @@ const DemandeAside = () => {
         size="lg"
       >
         <ModalHeader toggle={onClickBtnClose}>
+          {modeAside === 'ADD' && <i className="fas fa-plus-circle mr-2 text-success"></i>}
+          {modeAside === 'EDIT' && <i className="fas fa-edit mr-2 text-primary"></i>}
+          {modeAside === 'DELETE' && <i className="fas fa-trash-alt mr-2 text-danger"></i>}
+          {modeAside === 'CONSULT' && <i className="fas fa-eye mr-2 text-secondary"></i>}
           {getModalTitle()}
         </ModalHeader>
         <ModalBody>
+          {modeAside === 'DELETE' && (
+            <div className="alert alert-danger mb-4 d-flex align-items-center">
+              <i className="fas fa-exclamation-triangle mr-2"></i>
+              <div>{messages.deleteWarning || "Attention ! Cette action est irréversible. Toutes les données associées à cette demande seront supprimées."}</div>
+            </div>
+          )}
+          
           <Form>
             {/* Afficher l'ID uniquement en mode EDIT, DELETE ou CONSULT */}
             {modeAside !== 'ADD' && (
               <FormGroup>
-                <Label for="idDemande">ID</Label>
+                <Label for="idDemande" className="d-flex align-items-center">
+                  <i className="fas fa-hashtag mr-2 text-muted"></i>
+                  ID
+                </Label>
                 <Input
                   type="text"
                   name="idDemande"
@@ -395,12 +470,16 @@ const DemandeAside = () => {
                   value={formData.idDemande || ''}
                   readOnly
                   disabled
+                  className="bg-light"
                 />
               </FormGroup>
             )}
 
             <FormGroup>
-              <Label for="description">{messages.description || "Description"} *</Label>
+              <Label for="description" className="d-flex align-items-center font-weight-bold">
+                <i className="fas fa-align-left mr-2 text-primary"></i>
+                {messages.description || "Description"} <span className="text-danger">*</span>
+              </Label>
               <Input
                 type="textarea"
                 name="description"
@@ -409,28 +488,38 @@ const DemandeAside = () => {
                 value={formData.description || ''}
                 onChange={handleChange}
                 readOnly={isReadOnly}
+                disabled={isReadOnly}
                 required
+                className="form-control-modern"
               />
             </FormGroup>
 
             <div className="row">
+            {/* {(modeAside === 'CONSULT' || modeAside === 'DELETE') && (
               <div className="col-md-6">
                 <FormGroup>
-                  <Label for="dateCreation">{messages.dateCreation || "Date de création"}</Label>
+                  <Label for="dateCreation" className="d-flex align-items-center font-weight-bold">
+                    <i className="fas fa-calendar-plus mr-2 text-info"></i>
+                    {messages.dateCreation || "Date de création"}
+                  </Label>
                   <Input
                     type="date"
                     name="dateCreation"
                     id="dateCreation"
-                    value={formData.dateCreation ? new Date(formData.dateCreation).toISOString().split('T')[0] : ''}
-                    onChange={handleChange}
+                    //value={formData.dateCreation ? new Date(formData.dateCreation).toISOString().split('T')[0] : ''}
+                    value={formData.dateCreation ? new Date(formData.dateCreation).toLocaleDateString('fr-FR', { year: 'numeric', month: '2-digit', day: '2-digit' }).split('/').reverse().join('-') : ''}                    onChange={handleChange}
                     readOnly={true}
                     disabled={true}
+                    className="bg-light"
                   />
                 </FormGroup>
-              </div>
+              </div>)} */}
               <div className="col-md-6">
                 <FormGroup>
-                  <Label for="dateEcheance">{messages.dateEcheance || "Date d'échéance"}</Label>
+                  <Label for="dateEcheance" className="d-flex align-items-center font-weight-bold">
+                    <i className="fas fa-calendar-check mr-2 text-warning"></i>
+                    {messages.dateEcheance || "Date d'échéance"}
+                  </Label>
                   <Input
                     type="date"
                     name="dateEcheance"
@@ -438,6 +527,8 @@ const DemandeAside = () => {
                     value={formData.dateEcheance ? new Date(formData.dateEcheance).toISOString().split('T')[0] : ''}
                     onChange={handleChange}
                     readOnly={isReadOnly}
+                    disabled={isReadOnly}
+                    className="form-control-modern"
                   />
                 </FormGroup>
               </div>
@@ -446,7 +537,10 @@ const DemandeAside = () => {
             <div className="row">
               <div className="col-md-6">
                 <FormGroup>
-                  <Label for="etat">{messages.etat || "État"}</Label>
+                  <Label for="etat" className="d-flex align-items-center font-weight-bold">
+                    <i className="fas fa-tasks mr-2 text-primary"></i>
+                    {messages.etat || "État"}
+                  </Label>
                   <SelectBox
                     dataSource={Object.keys(ETATS_DEMANDE).map(key => ({
                       id: ETATS_DEMANDE[key],
@@ -462,7 +556,10 @@ const DemandeAside = () => {
               </div>
               <div className="col-md-6">
                 <FormGroup>
-                  <Label for="priorite">{messages.priorite || "Priorité"}</Label>
+                  <Label for="priorite" className="d-flex align-items-center font-weight-bold">
+                    <i className="fas fa-flag mr-2 text-danger"></i>
+                    {messages.priorite || "Priorité"}
+                  </Label>
                   <SelectBox
                     dataSource={Object.keys(PRIORITES_DEMANDE).map(key => ({
                       id: PRIORITES_DEMANDE[key],
@@ -479,7 +576,10 @@ const DemandeAside = () => {
             </div>
 
             <FormGroup>
-              <Label for="commentaire">{messages.commentaire || "Commentaire"}</Label>
+              <Label for="commentaire" className="d-flex align-items-center font-weight-bold">
+                <i className="fas fa-comment-alt mr-2 text-success"></i>
+                {messages.commentaire || "Commentaire"}
+              </Label>
               <Input
                 type="textarea"
                 name="commentaire"
@@ -488,13 +588,17 @@ const DemandeAside = () => {
                 value={formData.commentaire || ''}
                 onChange={handleChange}
                 readOnly={isReadOnly}
+                disabled={isReadOnly}
               />
             </FormGroup>
 
             <div className="row">
               <div className="col-md-6">
                 <FormGroup>
-                  <Label for="client">{messages.client || "Client"}</Label>
+                  <Label for="client" className="d-flex align-items-center font-weight-bold">
+                    <i className="fas fa-building mr-2 text-secondary"></i>
+                    {messages.client || "Client"}
+                  </Label>
                   <SelectBox
                     dataSource={allClient || []}
                     displayExpr="nom"
@@ -511,7 +615,10 @@ const DemandeAside = () => {
               </div>
               <div className="col-md-6">
                 <FormGroup>
-                  <Label for="module">{messages.module || "Module"}</Label>
+                  <Label for="module" className="d-flex align-items-center font-weight-bold">
+                    <i className="fas fa-puzzle-piece mr-2 text-info"></i>
+                    {messages.module || "Module"}
+                  </Label>
                   <SelectBox
                     dataSource={allModule || []}
                     displayExpr="designation"
@@ -531,7 +638,10 @@ const DemandeAside = () => {
             <div className="row">
               <div className="col-md-6">
                 <FormGroup>
-                  <Label for="equipe">{messages.equipe || "Équipe"}</Label>
+                  <Label for="equipe" className="d-flex align-items-center font-weight-bold">
+                    <i className="fas fa-users mr-2 text-warning"></i>
+                    {messages.equipe || "Équipe"}
+                  </Label>
                   <SelectBox
                     dataSource={allEquipe || []}
                     displayExpr="designation"
@@ -541,15 +651,25 @@ const DemandeAside = () => {
                       const selectedEquipe = allEquipe.find(eq => eq.idEquipe === e.value);
                       handleSelectChange('equipe', selectedEquipe);
                     }}
-                    disabled={isReadOnly}
+                    disabled={isTeamAndCollabReadOnly}
+                    placeholder={messages.selectEquipe || "Sélectionner une équipe"}
                   />
+                  {modeAside === 'ADD' && (
+                    <small className="text-muted mt-1 d-flex align-items-center">
+                      <i className="fas fa-info-circle mr-1"></i>
+                      {messages.teamAssignedLater || "L'équipe sera assignée ultérieurement"}
+                    </small>
+                  )}
                 </FormGroup>
               </div>
               <div className="col-md-6">
                 <FormGroup>
-                  <Label for="collaborateur">{messages.collaborateur || "Collaborateur"}</Label>
+                  <Label for="collaborateur" className="d-flex align-items-center font-weight-bold">
+                    <i className="fas fa-user mr-2 text-primary"></i>
+                    {messages.collaborateur || "Collaborateur"}
+                  </Label>
                   <SelectBox
-                    dataSource={allCollaborateur || []}
+                    dataSource={filteredCollaborateurs}
                     displayExpr={item => item ? `${item.prenom} ${item.nom}` : ''}
                     valueExpr="username"
                     value={formData.collaborateur ? formData.collaborateur.username : null}
@@ -557,8 +677,25 @@ const DemandeAside = () => {
                       const selectedCollaborateur = allCollaborateur.find(c => c.username === e.value);
                       handleSelectChange('collaborateur', selectedCollaborateur);
                     }}
-                    disabled={isReadOnly}
+                    disabled={isTeamAndCollabReadOnly}
+                    placeholder={modeAside === 'ADD' 
+                      ? (messages.collabAssignedLater || "Le collaborateur sera assigné ultérieurement") 
+                      : (formData.equipe 
+                        ? (messages.selectCollaborateur || "Sélectionner un collaborateur") 
+                        : (messages.selectEquipeFirst || "Veuillez d'abord sélectionner une équipe"))}
                   />
+                  {modeAside === 'ADD' && (
+                    <small className="text-muted mt-1 d-flex align-items-center">
+                      <i className="fas fa-info-circle mr-1"></i>
+                      {messages.collabAssignedLater || "Le collaborateur sera assigné ultérieurement"}
+                    </small>
+                  )}
+                  {!isReadOnly && !modeAside === 'ADD' && !formData.equipe && (
+                    <small className="text-muted mt-1 d-flex align-items-center">
+                      <i className="fas fa-info-circle mr-1"></i>
+                      {messages.selectEquipeFirst || "Veuillez d'abord sélectionner une équipe"}
+                    </small>
+                  )}
                 </FormGroup>
               </div>
             </div>
@@ -576,18 +713,33 @@ const DemandeAside = () => {
         className="modal-dialog-centered"
         size="sm"
       >
-        <ModalHeader toggle={() => dispatch(handleCloseModalConfirmation())}>
+        <ModalHeader toggle={() => dispatch(handleCloseModalConfirmation())} className="bg-warning text-white">
+          <i className="fas fa-question-circle mr-2"></i>
           {messages.confirmation || "Confirmation"}
         </ModalHeader>
-        <ModalBody>{messageToShow}</ModalBody>
+        <ModalBody className="p-4">
+          <p className="mb-0">{messageToShow}</p>
+        </ModalBody>
         <ModalFooter>
           <Button
             color="secondary"
-            onClick={() => dispatch(handleCloseModalConfirmation())}
+            onClick={() => {
+              if (
+                actionBtnModalConfirmation &&
+                typeof actionBtnModalConfirmation.handleBtnCancelModalConfirmation === "function"
+              ) {
+                actionBtnModalConfirmation.handleBtnCancelModalConfirmation();
+              } else {
+                dispatch(handleCloseModalConfirmation());
+              }
+            }}
+            className="px-4"
           >
+            <i className="fas fa-times mr-1"></i>
             {messages.cancel || "Annuler"}
           </Button>
-          <Button color="primary" onClick={handleConfirmAction}>
+          <Button color="primary" onClick={handleConfirmAction} className="px-4">
+            <i className="fas fa-check mr-1&"></i>
             {messages.confirm || "Confirmer"}
           </Button>
         </ModalFooter>

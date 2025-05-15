@@ -128,7 +128,10 @@ const ClientAside = () => {
                   ClientAsideReducer.modeAside === 'DELETE' || 
                   ClientAsideReducer.modeAside === 'CONSULT') && (
                     <FormGroup>
-                        <Label for="idClient">ID</Label>
+                        <Label for="idClient" className="d-flex align-items-center">
+                            <i className="fas fa-hashtag mr-2 text-muted"></i>
+                            ID
+                        </Label>
                         <Input
                             type="text"
                             name="idClient"
@@ -136,11 +139,15 @@ const ClientAside = () => {
                             value={formData.idClient || ''}
                             readOnly={true}
                             disabled={true}
+                            className="bg-light"
                         />
                     </FormGroup>
                 )}
                 <FormGroup>
-                    <Label for="nom">{messages.Nom || "Nom"}</Label>
+                    <Label for="nom" className="d-flex align-items-center font-weight-bold">
+                        <i className="fas fa-building mr-2 text-primary"></i>
+                        {messages.Nom || "Nom"} <span className="text-danger">*</span>
+                    </Label>
                     <Input
                         type="text"
                         name="nom"
@@ -153,7 +160,10 @@ const ClientAside = () => {
                 </FormGroup>
                 
                 <FormGroup>
-                    <Label for="telephone">{messages.Telephone || "Téléphone"}</Label>
+                    <Label for="telephone" className="d-flex align-items-center font-weight-bold">
+                        <i className="fas fa-phone mr-2 text-success"></i>
+                        {messages.Telephone || "Téléphone"}
+                    </Label>
                     <Input
                         type="text"
                         name="telephone"
@@ -164,7 +174,10 @@ const ClientAside = () => {
                     />
                 </FormGroup>
                 <FormGroup>
-                    <Label for="email">{messages.Email || "Email"}</Label>
+                    <Label for="email" className="d-flex align-items-center font-weight-bold">
+                        <i className="fas fa-envelope mr-2 text-warning"></i>
+                        {messages.Email || "Email"}
+                    </Label>
                     <Input
                         type="email"
                         name="email"
@@ -175,7 +188,10 @@ const ClientAside = () => {
                     />
                 </FormGroup>
                 <FormGroup>
-                    <Label for="adresse">{messages.Adresse || "Adresse"}</Label>
+                    <Label for="adresse" className="d-flex align-items-center font-weight-bold">
+                        <i className="fas fa-map-marker-alt mr-2 text-danger"></i>
+                        {messages.Adresse || "Adresse"}
+                    </Label>
                     <Input
                         type="text"
                         name="adresse"
@@ -186,26 +202,40 @@ const ClientAside = () => {
                     />
                 </FormGroup>
                 
-                {ClientAsideReducer.modeAside === 'ADD' && (
-                    <Button color="primary" type="submit">
-                        {messages.Save || "Enregistrer"}
+                <div className="d-flex justify-content-end mt-4">
+                    <Button color="secondary" onClick={() => dispatch(handleClose())} className="mr-2 px-4">
+                        <i className="fas fa-times mr-2"></i>
+                        {messages.Cancel || "Annuler"}
                     </Button>
-                )}
-                
-                {ClientAsideReducer.modeAside === 'EDIT' && (
-                    <Button color="primary" type="submit">
-                        {messages.Update || "Mettre à jour"}
-                    </Button>
-                )}
-                
-                {ClientAsideReducer.modeAside === 'DELETE' && (
-                    <Button color="danger" type="submit">
-                        {messages.Delete || "Supprimer"}
-                    </Button>
-                )}
-                <Button color="secondary" onClick={() => dispatch(handleClose())} className="ml-2">
-                    {messages.Cancel || "Annuler"}
-                </Button>
+                    
+                    {ClientAsideReducer.modeAside === 'ADD' && (
+                        <Button color="success" type="submit" className="px-4">
+                            <i className="fas fa-plus-circle mr-2"></i>
+                            {messages.Save || "Enregistrer"}
+                        </Button>
+                    )}
+                    
+                    {ClientAsideReducer.modeAside === 'EDIT' && (
+                        <Button color="primary" type="submit" className="px-4">
+                            <i className="fas fa-save mr-2"></i>
+                            {messages.Update || "Mettre à jour"}
+                        </Button>
+                    )}
+                    
+                    {ClientAsideReducer.modeAside === 'DELETE' && (
+                        <Button color="danger" type="submit" className="px-4">
+                            <i className="fas fa-trash-alt mr-2"></i>
+                            {messages.Delete || "Supprimer"}
+                        </Button>
+                    )}
+                    
+                    {ClientAsideReducer.modeAside === 'CONSULT' && (
+                        <Button color="secondary" onClick={() => dispatch(handleClose())} className="px-4">
+                            <i className="fas fa-times mr-2"></i>
+                            {messages.Close || "Fermer"}
+                        </Button>
+                    )}
+                </div>
             </Form>
         );
     };
@@ -214,12 +244,38 @@ const ClientAside = () => {
         <>
             <Modal isOpen={ClientAsideReducer.isOpen} toggle={() => dispatch(handleClose())} size="lg">
                 <ModalHeader toggle={() => dispatch(handleClose())}>
-                    {ClientAsideReducer.modeAside === 'ADD' && (messages.AddClient || "Ajouter un client")}
-                    {ClientAsideReducer.modeAside === 'EDIT' && (messages.EditClient || "Modifier un client")}
-                    {ClientAsideReducer.modeAside === 'DELETE' && (messages.DeleteClient || "Supprimer un client")}
-                    {ClientAsideReducer.modeAside === 'CONSULT' && (messages.ConsultClient || "Consulter un client")}
+                    {ClientAsideReducer.modeAside === 'ADD' && (
+                        <>
+                            <i className="fas fa-plus-circle mr-2 text-success"></i>
+                            {messages.AddClient || "Ajouter un client"}
+                        </>
+                    )}
+                    {ClientAsideReducer.modeAside === 'EDIT' && (
+                        <>
+                            <i className="fas fa-edit mr-2 text-primary"></i>
+                            {messages.EditClient || "Modifier un client"}
+                        </>
+                    )}
+                    {ClientAsideReducer.modeAside === 'DELETE' && (
+                        <>
+                            <i className="fas fa-trash-alt mr-2 text-danger"></i>
+                            {messages.DeleteClient || "Supprimer un client"}
+                        </>
+                    )}
+                    {ClientAsideReducer.modeAside === 'CONSULT' && (
+                        <>
+                            <i className="fas fa-eye mr-2 text-secondary"></i>
+                            {messages.ConsultClient || "Consulter un client"}
+                        </>
+                    )}
                 </ModalHeader>
                 <ModalBody>
+                    {ClientAsideReducer.modeAside === 'DELETE' && (
+                        <div className="alert alert-danger mb-4 d-flex align-items-center">
+                            <i className="fas fa-exclamation-triangle mr-2"></i>
+                            <div>{messages.deleteWarning || "Attention ! Cette action est irréversible. Toutes les données associées à ce client seront supprimées."}</div>
+                        </div>
+                    )}
                     {renderForm()}
                 </ModalBody>
             </Modal>
@@ -231,14 +287,16 @@ const ClientAside = () => {
                 className="modal-dialog-centered"
                 size="sm"
             >
-                <ModalHeader toggle={() => dispatch(handleCloseModalConfirmation())}>
+                <ModalHeader toggle={() => dispatch(handleCloseModalConfirmation())} className="bg-warning text-white">
+                    <i className="fas fa-question-circle mr-2"></i>
                     {messages.Confirmation || "Confirmation"}
                 </ModalHeader>
-                <ModalBody>
-                    Êtes-vous sûr de vouloir supprimer ce client ?
+                <ModalBody className="p-4">
+                    <p className="mb-0">{ClientAsideReducer.messageToShow || "Êtes-vous sûr de vouloir supprimer ce client ?"}</p>
                 </ModalBody>
                 <ModalFooter>
-                    <Button color="secondary" onClick={() => dispatch(handleCloseModalConfirmation())}>
+                    <Button color="secondary" onClick={() => dispatch(handleCloseModalConfirmation())} className="px-3">
+                        <i className="fas fa-times mr-2"></i>
                         {messages.Cancel || "Annuler"}
                     </Button>
                     <Button color="primary" onClick={() => {
@@ -255,7 +313,8 @@ const ClientAside = () => {
                                 notify(messages.ErrorDelete || "Erreur lors de la suppression du client", "error", notifyOptions);
                                 console.error("Delete client error:", error);
                             });
-                    }}>
+                    }} className="px-3">
+                        <i className="fas fa-check mr-2"></i>
                         {messages.Confirm || "Confirmer"}
                     </Button>
                 </ModalFooter>

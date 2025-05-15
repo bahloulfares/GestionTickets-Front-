@@ -174,18 +174,19 @@ const EquipeGrid = () => {
         {
             dataField: 'idEquipe',
             caption: messages.id || 'ID',
+            alignment: 'left',
             //visible: false
-            width: 50
+            //width: 50
         },
         {
             dataField: 'designation',
             caption: messages.designation || 'Désignation',
-            width: 400
+            //width: 400
         },
         {
             caption: messages.members || 'Membres',
             calculateCellValue: formatUsers,
-            width: 300
+            //width: 300
         },
         { 
             dataField: 'actif', 
@@ -193,7 +194,7 @@ const EquipeGrid = () => {
             dataType: 'boolean',
             allowSorting: true,
             allowFiltering: true,
-            width: 80,
+            //width: 80,
             cellTemplate: (container, options) => {
                 const div = document.createElement('div');
                 div.className = 'text-center';

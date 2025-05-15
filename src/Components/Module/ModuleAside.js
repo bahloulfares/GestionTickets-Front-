@@ -52,15 +52,40 @@ const ModuleAside = () => {
     const getTitle = () => {
         switch (modeAside) {
             case 'add':
-                return messages.addModule || "Add Module";
+                return (
+                    <>
+                        <i className="fas fa-plus-circle mr-2 text-success"></i>
+                        {messages.addModule || "Add Module"}
+                    </>
+                );
             case 'EDIT':
-                return messages.editModule || "Edit Module";
+                return (
+                    <>
+                        <i className="fas fa-edit mr-2 text-primary"></i>
+                        {messages.editModule || "Edit Module"}
+                    </>
+                );
             case 'DELETE':
-                return messages.deleteModule || "Delete Module";
+                return (
+                    <>
+                        <i className="fas fa-trash-alt mr-2 text-danger"></i>
+                        {messages.deleteModule || "Delete Module"}
+                    </>
+                );
             case 'CONSULT':
-                return messages.consultModule || "View Module";
+                return (
+                    <>
+                        <i className="fas fa-eye mr-2 text-secondary"></i>
+                        {messages.consultModule || "View Module"}
+                    </>
+                );
             default:
-                return messages.module || "Module";
+                return (
+                    <>
+                        <i className="fas fa-puzzle-piece mr-2 text-info"></i>
+                        {messages.module || "Module"}
+                    </>
+                );
         }
     };
     
@@ -69,10 +94,12 @@ const ModuleAside = () => {
             case 'add':
                 return (
                     <>
-                        <Button color="secondary" onClick={onClickBtnClose}>
+                        <Button color="secondary" onClick={onClickBtnClose} className="px-4">
+                            <i className="fas fa-times mr-2"></i>
                             {messages.cancel || "Cancel"}
                         </Button>
-                        <Button color="primary" onClick={handleSubmit}>
+                        <Button color="success" onClick={handleSubmit} className="px-4">
+                            <i className="fas fa-plus-circle mr-2"></i>
                             {messages.save || "Save"}
                         </Button>
                     </>
@@ -80,10 +107,12 @@ const ModuleAside = () => {
             case 'EDIT':
                 return (
                     <>
-                        <Button color="secondary" onClick={onClickBtnClose}>
+                        <Button color="secondary" onClick={onClickBtnClose} className="px-4">
+                            <i className="fas fa-times mr-2"></i>
                             {messages.cancel || "Cancel"}
                         </Button>
-                        <Button color="primary" onClick={handleSubmit}>
+                        <Button color="primary" onClick={handleSubmit} className="px-4">
+                            <i className="fas fa-save mr-2"></i>
                             {messages.save || "Save"}
                         </Button>
                     </>
@@ -91,17 +120,20 @@ const ModuleAside = () => {
             case 'DELETE':
                 return (
                     <>
-                        <Button color="secondary" onClick={onClickBtnClose}>
+                        <Button color="secondary" onClick={onClickBtnClose} className="px-4">
+                            <i className="fas fa-times mr-2"></i>
                             {messages.cancel || "Cancel"}
                         </Button>
-                        <Button color="danger" onClick={handleSubmit}>
+                        <Button color="danger" onClick={handleSubmit} className="px-4">
+                            <i className="fas fa-trash-alt mr-2"></i>
                             {messages.delete || "Delete"}
                         </Button>
                     </>
                 );
             case 'CONSULT':
                 return (
-                    <Button color="secondary" onClick={onClickBtnClose}>
+                    <Button color="secondary" onClick={onClickBtnClose} className="px-4">
+                        <i className="fas fa-times mr-2"></i>
                         {messages.close || "Close"}
                     </Button>
                 );
@@ -197,59 +229,122 @@ const ModuleAside = () => {
     };
     
     return (
-        <Modal isOpen={isOpen} toggle={onClickBtnClose} className="module-modal" style={{ direction: direction }}>
-            <ModalHeader toggle={onClickBtnClose}>
-                {getTitle()}
-            </ModalHeader>
-            <ModalBody>
-                <Form>
-                    {/* Remove or hide ID field in add mode since it's auto-incremented */}
-                    {modeAside !== 'add' && (
+        <>
+            <Modal isOpen={isOpen} toggle={onClickBtnClose} className="module-modal" style={{ direction: direction }}>
+                <ModalHeader toggle={onClickBtnClose}>
+                    {getTitle()}
+                </ModalHeader>
+                <ModalBody>
+                    {modeAside === 'DELETE' && (
+                        <div className="alert alert-danger mb-4 d-flex align-items-center">
+                            <i className="fas fa-exclamation-triangle mr-2"></i>
+                            <div>{messages.deleteWarning || "Attention ! Cette action est irréversible. Toutes les données associées à ce module seront supprimées."}</div>
+                        </div>
+                    )}
+                    <Form>
+                        {/* Remove or hide ID field in add mode since it's auto-incremented */}
+                        {modeAside !== 'add' && (
+                            <FormGroup>
+                                <Label for="idModule" className="d-flex align-items-center">
+                                    <i className="fas fa-hashtag mr-2 text-muted"></i>
+                                    {messages.id || "ID"}
+                                </Label>
+                                <Input
+                                    type="text"
+                                    name="idModule"
+                                    id="idModule"
+                                    placeholder={messages.id || "ID"}
+                                    value={formData.idModule}
+                                    disabled={true} // Always disabled since it's auto-generated
+                                    readOnly
+                                    className="bg-light"
+                                />
+                            </FormGroup>
+                        )}
+                        
                         <FormGroup>
-                            <Label for="idModule">{messages.id || "ID"}</Label>
+                            <Label for="designation" className="d-flex align-items-center font-weight-bold">
+                                {/* <i className="fas fa-puzzle-piece mr-2 text-primary"></i> */}
+                                {messages.name || "Name"} <span className="text-danger">*</span>
+                            </Label>
                             <Input
                                 type="text"
-                                name="idModule"
-                                id="idModule"
-                                placeholder={messages.id || "ID"}
-                                value={formData.idModule}
-                                disabled={true} // Always disabled since it's auto-generated
-                                readOnly
-                            />
-                        </FormGroup>
-                    )}
-                    
-                    <FormGroup>
-                        <Label for="designation">{messages.name || "Name"}</Label>
-                        <Input
-                            type="text"
-                            name="designation"
-                            id="designation"
-                            placeholder={messages.name || "Name"}
-                            value={formData.designation}
-                            onChange={handleChange}
-                            disabled={modeAside === "CONSULT" || modeAside === "DELETE"}
-                        />
-                    </FormGroup>
-                    
-                    <FormGroup check>
-                        <Label check>
-                            <Input
-                                type="checkbox"
-                                name="actif"
-                                checked={formData.actif}
+                                name="designation"
+                                id="designation"
+                                placeholder={messages.name || "Name"}
+                                value={formData.designation}
                                 onChange={handleChange}
                                 disabled={modeAside === "CONSULT" || modeAside === "DELETE"}
-                            />{' '}
-                            {messages.actif || "Active"}
-                        </Label>
-                    </FormGroup>
-                </Form>
-            </ModalBody>
-            <ModalFooter>
-                {renderFooterButtons()}
-            </ModalFooter>
-        </Modal>
+                            />
+                        </FormGroup>
+                        
+                        <FormGroup check className="mt-3">
+                            <Label check className="d-flex align-items-center">
+                                <Input
+                                    type="checkbox"
+                                    name="actif"
+                                    checked={formData.actif}
+                                    onChange={handleChange}
+                                    disabled={modeAside === "CONSULT" || modeAside === "DELETE"}
+                                    className="mr-2"
+                                />
+                                {/* <i className="fas fa-toggle-on mr-2 text-success"></i> */}
+                                {messages.actif || "Active"}
+                            </Label>
+                        </FormGroup>
+                    </Form>
+                </ModalBody>
+                <ModalFooter>
+                    {renderFooterButtons()}
+                </ModalFooter>
+            </Modal>
+
+            {/* Modal de confirmation */}
+            <Modal
+                isOpen={ModuleAsideReducer.isOpenModalConfirmation}
+                toggle={() => dispatch(handleCloseModalConfirmation())}
+                className="modal-confirmation"
+                size="sm"
+            >
+                <ModalHeader toggle={() => dispatch(handleCloseModalConfirmation())} className="bg-warning text-white">
+                    <i className="fas fa-question-circle mr-2"></i>
+                    {messages.confirmation || "Confirmation"}
+                </ModalHeader>
+                <ModalBody className="p-4">
+                    <p className="mb-0">{ModuleAsideReducer.messageToShow}</p>
+                </ModalBody>
+                <ModalFooter>
+                    <Button
+                        color="secondary"
+                        onClick={() => {
+                            if (ModuleAsideReducer.handleBtnCancelModalConfirmation) {
+                                ModuleAsideReducer.handleBtnCancelModalConfirmation();
+                            } else {
+                                dispatch(handleCloseModalConfirmation());
+                            }
+                        }}
+                        className="px-3"
+                    >
+                        <i className="fas fa-times mr-2"></i>
+                        {messages.cancel || "Annuler"}
+                    </Button>
+                    <Button
+                        color="primary"
+                        onClick={() => {
+                            if (ModuleAsideReducer.handleBtnConfirmerModalConfirmation) {
+                                ModuleAsideReducer.handleBtnConfirmerModalConfirmation();
+                            } else {
+                                dispatch(handleCloseModalConfirmation());
+                            }
+                        }}
+                        className="px-3"
+                    >
+                        <i className="fas fa-check mr-2"></i>
+                        {messages.confirm || "Confirmer"}
+                    </Button>
+                </ModalFooter>
+            </Modal>
+        </>
     );
 };
 

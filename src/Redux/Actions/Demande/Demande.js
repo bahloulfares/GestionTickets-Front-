@@ -162,3 +162,90 @@ export const setSelectedDemande = (demande) => ({
 export const resetDemande = () => ({
     type: types.RESET_DEMANDE
 });
+
+// Action pour assigner une équipe à une demande
+export const assignerEquipe = (idDemande, idEquipe) => async (dispatch) => {
+    try {
+        dispatch({ type: 'ASSIGNER_EQUIPE_REQUEST' });
+        
+        const response = await axios.put(
+            `${Ressources.CoreUrlB}/${Ressources.compteClient.api}/${Ressources.compteClient.demandes}/${idDemande}/equipe/${idEquipe}`
+        );
+        
+        dispatch({
+            type: 'ASSIGNER_EQUIPE_SUCCESS',
+            payload: response.data
+        });
+        
+        notify('Équipe assignée avec succès', 'success', notifyOptions);
+        return response.data;
+    } catch (error) {
+        console.error('Erreur lors de l\'assignation de l\'équipe:', error);
+        notify('Erreur lors de l\'assignation de l\'équipe', 'error', notifyOptions);
+        
+        dispatch({
+            type: 'ASSIGNER_EQUIPE_FAILURE',
+            payload: error.message
+        });
+        
+        throw error;
+    }
+};
+
+// Action pour assigner un collaborateur à une demande
+export const assignerCollaborateur = (idDemande, username) => async (dispatch) => {
+    try {
+        dispatch({ type: 'ASSIGNER_COLLABORATEUR_REQUEST' });
+        
+        const response = await axios.put(
+            `${Ressources.CoreUrlB}/${Ressources.compteClient.api}/${Ressources.compteClient.demandes}/${idDemande}/collaborateur/${username}`
+        );
+        
+        dispatch({
+            type: 'ASSIGNER_COLLABORATEUR_SUCCESS',
+            payload: response.data
+        });
+        
+        notify('Collaborateur assigné avec succès', 'success', notifyOptions);
+        return response.data;
+    } catch (error) {
+        console.error('Erreur lors de l\'assignation du collaborateur:', error);
+        notify('Erreur lors de l\'assignation du collaborateur', 'error', notifyOptions);
+        
+        dispatch({
+            type: 'ASSIGNER_COLLABORATEUR_FAILURE',
+            payload: error.message
+        });
+        
+        throw error;
+    }
+};
+
+// Action pour assigner une équipe et un collaborateur à une demande
+export const assignerEquipeEtCollaborateur = (idDemande, idEquipe, username) => async (dispatch) => {
+    try {
+        dispatch({ type: 'ASSIGNER_EQUIPE_ET_COLLABORATEUR_REQUEST' });
+        
+        const response = await axios.put(
+            `${Ressources.CoreUrlB}/${Ressources.compteClient.api}/${Ressources.compteClient.demandes}/${idDemande}/equipe/${idEquipe}/collaborateur/${username}`
+        );
+        
+        dispatch({
+            type: 'ASSIGNER_EQUIPE_ET_COLLABORATEUR_SUCCESS',
+            payload: response.data
+        });
+        
+        notify('Équipe et collaborateur assignés avec succès', 'success', notifyOptions);
+        return response.data;
+    } catch (error) {
+        console.error('Erreur lors de l\'assignation de l\'équipe et du collaborateur:', error);
+        notify('Erreur lors de l\'assignation de l\'équipe et du collaborateur', 'error', notifyOptions);
+        
+        dispatch({
+            type: 'ASSIGNER_EQUIPE_ET_COLLABORATEUR_FAILURE',
+            payload: error.message
+        });
+        
+        throw error;
+    }
+};

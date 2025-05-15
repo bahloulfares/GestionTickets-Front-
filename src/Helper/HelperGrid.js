@@ -175,6 +175,22 @@ const HelperGrid = {
                 }
             },
             {
+                widget: 'dxButton',
+                location: "after",
+                visible: buttons.desaffecte !== undefined && buttons.desaffecte.visible,
+                options: {
+                    icon: 'fas fa-unlink',
+                    text: messages.desaffecte || "Désaffecter",
+                    disabled: disableButtons,
+                    onInitialized: (args) => {
+                        if (Reducer !== undefined) Reducer.btnDesaffecteInstance = args.component;
+                    },
+                    onClick: () => {
+                        buttons.desaffecte.action();
+                    }
+                }
+            },
+            {
                 location: "after",
                 widget: 'dxDropDownButton',
                 options: {
@@ -258,6 +274,8 @@ const HelperGrid = {
                 Reducer.btnEditionInstance.option('disabled', disableButtons);
             if (Reducer.btnAffecteInstance !== undefined)
                 Reducer.btnAffecteInstance.option('disabled', disableButtons);
+            if (Reducer.btnDesaffecteInstance !== undefined)
+                Reducer.btnDesaffecteInstance.option('disabled', disableButtons);
         } else {
             Reducer.btnConsultInstance.option('disabled', !disableButtons);
             Reducer.btnEditInstance.option('disabled', !disableButtons);
@@ -268,6 +286,8 @@ const HelperGrid = {
                 Reducer.btnEditionInstance.option('disabled', !disableButtons);
             if (Reducer.btnAffecteInstance !== undefined)
                 Reducer.btnAffecteInstance.option('disabled', !disableButtons);
+            if (Reducer.btnDesaffecteInstance !== undefined)
+                Reducer.btnDesaffecteInstance.option('disabled', !disableButtons);
         }
     },
    /* constructCustomStore: function (url, filtres, Reducer, store, dataGrid, params, keyExpr = 'code') {

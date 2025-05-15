@@ -183,7 +183,7 @@ const ClientGrid = () => {
             onRowClick={onRowClick}
             fileName={messages.Clients || "Clients"}
             columns={[
-                { dataField: 'idClient', caption: "ID", width: 80 },
+                { dataField: 'idClient', caption: "ID",alignment: 'left', },
                 { dataField: 'nom', caption: messages.Nom || "Nom" },
                 { dataField: 'telephone', caption: messages.Telephone || "Téléphone" },
                 { dataField: 'email', caption: messages.Email || "Email" },
