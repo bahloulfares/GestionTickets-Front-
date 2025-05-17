@@ -13,6 +13,7 @@ import ClientPage from '../Client/ClientPage';
 import { Role } from '../../Helper/Enums/Role';
 import EquipePage from '../Equipe/EquipePage'
 import DemandePage from '../Demande/DemandePage'
+import StatistiquePage from '../Statistique/StatistiquePage';
 
 const Menu_Hooks = () => {
   const dispatch = useDispatch()
@@ -118,6 +119,15 @@ const Menu_Hooks = () => {
             title: title,
             icon: <i className={submenu.logo} />,
             component: <EquipePage/>
+          }))
+          break;
+        
+        case 'AllStatistiques':
+          dispatch(addTab({
+            key: `${submenu.codMnP}`,
+            title: title,
+            icon: <i className={submenu.logo} />,
+            component: <StatistiquePage/>,
           }))
           break;
       }

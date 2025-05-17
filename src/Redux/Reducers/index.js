@@ -18,6 +18,9 @@ import EquipesReducer from './Equipe/Equipe';
 import EquipeAsideReducer from './Equipe/EquipeAside';
 import DemandesReducer from './Demande/Demande';
 import DemandeAsideReducer from './Demande/DemandeAsideReducer';
+// Import du nouveau reducer Statistique
+import StatistiqueReducer from './Statistique/StatistiqueReducer';
+
 export default combineReducers({
     MenuTabsReducer, MenuReducer, HeaderReducer, intl: intlReducer
     , ModalReducerImpression
@@ -28,4 +31,5 @@ export default combineReducers({
     , LoginReducer,EquipesReducer,
     EquipeAsideReducer,DemandesReducer,
     DemandeAsideReducer,
+    StatistiqueReducer
 });

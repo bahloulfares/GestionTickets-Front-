@@ -31,6 +31,14 @@ module.exports = {
                 headers: {
                     Connection: 'keep-alive'
                 }
+            },
+            '/api/statistiques': {
+                target: 'http://localhost:9500',
+                secure: false,
+                changeOrigin: true,
+                headers: {
+                    Connection: 'keep-alive'
+                }
             }
         }
     },
